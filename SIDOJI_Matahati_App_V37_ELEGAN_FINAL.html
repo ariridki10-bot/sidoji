@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SIDOJI Matahati - V35</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--primary:#0f766e;--primary2:#115e59;--bg:#f4f7f9;--card:#fff;--text:#173042;--muted:#718096;--line:#e5eaf0;--danger:#b91c1c;--ok:#047857}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.hidden{display:none!important}.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:linear-gradient(135deg,#0f766e,#134e4a)}
+.login-card{width:min(430px,100%);background:#fff;border-radius:24px;padding:34px;box-shadow:0 25px 70px #0003}.brand{text-align:center;margin-bottom:28px}.brand .logo{width:64px;height:64px;border-radius:18px;background:var(--primary);color:white;display:grid;place-items:center;font-weight:800;font-size:24px;margin:auto}.brand h1{margin:14px 0 5px}.brand p{margin:0;color:var(--muted)}
+label{display:block;font-size:13px;font-weight:700;margin:16px 0 7px}input,select{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;font-size:15px;outline:none;background:#fff}input:focus,select:focus{border-color:var(--primary)}
+button{border:0;border-radius:11px;padding:11px 15px;font-weight:700;cursor:pointer}.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary2)}.btn-light{background:#f1f5f9;color:#334155}.btn-danger{background:#fee2e2;color:#991b1b}
+.login button{width:100%;margin-top:20px;padding:14px}.msg{margin-top:14px;padding:11px 12px;border-radius:10px;font-size:13px;background:#fff7ed;color:#9a3412}.ok{background:#ecfdf5;color:#047857}
+.app{min-height:100vh;display:flex}.sidebar{width:250px;background:#0f766e;color:#fff;padding:22px 16px;position:fixed;inset:0 auto 0 0}.side-brand{font-weight:800;font-size:21px;padding:8px 10px 24px}.side-brand small{display:block;font-weight:400;font-size:12px;opacity:.8;margin-top:3px}.nav button{width:100%;background:transparent;color:#dff7f5;text-align:left;margin:3px 0;padding:12px 13px}.nav button.active,.nav button:hover{background:#ffffff1b;color:#fff}.main{margin-left:250px;width:calc(100% - 250px)}.top{background:#fff;border-bottom:1px solid var(--line);padding:18px 28px;display:flex;justify-content:space-between;align-items:center}.top h2{margin:0;font-size:21px}.user{font-size:13px;color:var(--muted)}.content{padding:26px;max-width:1400px;margin:auto}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.card{background:var(--card);border-radius:17px;padding:20px;box-shadow:0 7px 22px #1630420d;border:1px solid #edf1f5}.label{font-size:13px;color:var(--muted)}.value{font-size:30px;font-weight:800;margin-top:7px}.section{margin-top:22px}.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px}.section h3{margin:0}.table-wrap{background:#fff;border-radius:17px;overflow:auto;border:1px solid var(--line)}table{width:100%;border-collapse:collapse;min-width:850px}th,td{padding:13px 15px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}th{font-size:12px;color:var(--muted);text-transform:uppercase}td.num{text-align:right}.pill{display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:700;background:#ecfdf5;color:#047857}.empty{padding:25px;color:var(--muted);text-align:center}
+.form-grid{display:grid;grid-template-columns:1.4fr .8fr;gap:18px}.form-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:20px}.hint{font-size:12px;color:var(--muted);margin-top:6px}.actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}.actions button{width:auto;margin-top:0}.search-results{margin-top:7px;border:1px solid var(--line);border-radius:12px;max-height:260px;overflow:auto;background:#fff}.person-option{padding:11px 13px;border-bottom:1px solid var(--line);cursor:pointer}.person-option:last-child{border-bottom:0}.person-option:hover{background:#f0fdfa}.person-option b{display:block}.person-option small{color:var(--muted)}.selected-person{margin-top:9px;padding:10px 12px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:11px;color:#065f46;font-size:13px}
+.juz-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:7px;margin-top:8px}.juz{padding:9px 0;border:1px solid var(--line);background:#fff;color:#334155;border-radius:9px;font-size:12px}.juz.selected{background:var(--primary);color:#fff;border-color:var(--primary)}.juz:disabled{opacity:.45;cursor:not-allowed}.mini{font-size:12px;color:var(--muted)}
+.toast{position:fixed;right:20px;bottom:20px;background:#173042;color:white;padding:12px 16px;border-radius:12px;box-shadow:0 10px 30px #0003;z-index:20}.loading{opacity:.6;pointer-events:none}
+@media(max-width:900px){.sidebar{width:210px}.main{margin-left:210px;width:calc(100% - 210px)}.cards{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}.juz-grid{grid-template-columns:repeat(6,1fr)}}
+@media(max-width:650px){.sidebar{position:static;width:100%;min-height:auto}.app{display:block}.main{margin:0;width:100%}.nav{display:grid;grid-template-columns:repeat(2,1fr)}.cards{grid-template-columns:1fr 1fr}.content{padding:16px}.top{padding:15px 16px}.juz-grid{grid-template-columns:repeat(5,1fr)}}
+
+.hutang-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+.hutang-box{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:14px}
+.hutang-box .n{font-size:24px;font-weight:800;margin-top:4px}
+.bayar-juz-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:8px;margin-top:10px}
+.bayar-juz{padding:10px 4px;border:1px solid var(--line);background:#fff;border-radius:10px;text-align:center;font-size:12px}
+.bayar-juz input{width:auto;margin:0 4px 0 0;padding:0;vertical-align:middle}
+.bayar-juz.paid{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
+.bayar-juz.locked{background:#f1f5f9;color:#94a3b8}
+.bayar-juz.available{cursor:pointer}
+.bayar-juz.available:hover{background:#f0fdfa;border-color:#0f766e}
+.bayar-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+@media(max-width:900px){.bayar-juz-grid{grid-template-columns:repeat(6,1fr)}.hutang-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.bayar-juz-grid{grid-template-columns:repeat(5,1fr)}.hutang-summary{grid-template-columns:1fr}}
+
+.pengajian-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+.pengajian-status{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.pengajian-status label{display:flex;align-items:center;gap:7px;border:1px solid #e2e8f0;border-radius:10px;padding:10px;cursor:pointer;background:#fff}
+.pengajian-status input{width:auto;margin:0}
+@media(max-width:800px){.pengajian-grid{grid-template-columns:1fr}.pengajian-status{grid-template-columns:1fr 1fr}}
+
+.status-badge{display:inline-block;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700;line-height:1;white-space:nowrap}
+.status-hadir{background:#dcfce7;color:#166534}.status-izin{background:#fef3c7;color:#92400e}.status-sakit{background:#dbeafe;color:#1e40af}.status-alpa{background:#fee2e2;color:#991b1b}.status-belum{background:#e5e7eb;color:#374151}
+
+.status-lunas{background:#dcfce7;color:#166534}.status-hutang{background:#fee2e2;color:#991b1b}.status-netral{background:#e5e7eb;color:#374151}
+.global-report .report-title{font-size:18px;font-weight:800;margin:0}.global-report .report-sub{color:#64748b;margin-top:4px}.global-table th{white-space:nowrap}.global-table td{vertical-align:middle}.global-status{font-weight:800}.print-only{display:none}
+
+@media print{
+  @page{size:A4 landscape;margin:10mm}
+  body.print-global{background:#fff}
+  body.print-global #loginPage,
+  body.print-global .sidebar,
+  body.print-global .top,
+  body.print-global #dashboardPage,
+  body.print-global #tilawahPage,
+  body.print-global #hutangPage,
+  body.print-global #pengajianPage,
+  body.print-global #rekapPage{display:none!important}
+  body.print-global #appPage{display:block!important;min-height:0}
+  body.print-global .main{margin:0!important;width:100%!important}
+  body.print-global .content{padding:0!important;max-width:none}
+  body.print-global #globalReportSection{display:block!important;margin:0}
+  body.print-global.print-tilawah #pengajianReportBlock{display:none!important}
+  body.print-global.print-pengajian #tilawahReportBlock{display:none!important}
+  body.print-global.print-pengajian #rekapSummary{display:none!important}
+  body.print-global #globalReportSection .no-print{display:none!important}
+  body.print-global .print-only{display:block!important}
+  body.print-global .table-wrap{border:0;overflow:visible}
+  body.print-global table{min-width:0;width:100%;font-size:9px}
+  body.print-global th,body.print-global td{padding:6px 5px}
+  body.print-global .global-report .report-title{font-size:17px}
+  body.print-global .report-sub{font-size:10px}
+}
+
+<style>
+.rekap-toolbar{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 7px 22px #1630420d}.rekap-heading h3{margin:0 0 4px;font-size:20px}.rekap-toolbar-actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}.rekap-toolbar-actions button{white-space:nowrap}.report-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:18px;box-shadow:0 7px 22px #1630420d}.report-head{align-items:flex-start}.report-actions{margin-top:0}.report-filter-card{margin-top:14px;background:#f8fafc}.report-filter-grid{grid-template-columns:repeat(5,1fr)!important;gap:12px}.report-summary{grid-template-columns:repeat(6,1fr);margin:16px 0}.report-print-header{text-align:center;margin-bottom:14px}.school-name{font-size:20px;font-weight:800}.report-name{font-size:15px;font-weight:800;margin:3px 0}
+@media(max-width:1050px){.rekap-toolbar{align-items:flex-start;flex-direction:column}.rekap-toolbar-actions{width:100%;justify-content:flex-start}.report-filter-grid{grid-template-columns:repeat(2,1fr)!important}.report-summary{grid-template-columns:repeat(3,1fr)}}@media(max-width:650px){.report-filter-grid{grid-template-columns:1fr!important}.report-summary{grid-template-columns:1fr 1fr}.report-head{display:block}.report-actions{justify-content:flex-start;margin-top:12px}}
+@media print{
+@page{size:A4 landscape;margin:10mm}
+body.print-tilawah #loginPage,body.print-tilawah .sidebar,body.print-tilawah .top,body.print-tilawah #dashboardPage,body.print-tilawah #tilawahPage,body.print-tilawah #hutangPage,body.print-tilawah #pengajianPage,body.print-tilawah #laporanPengajianSection,body.print-tilawah #rekapPage>.section-head,body.print-tilawah #rekapPage>.form-card,body.print-tilawah #rekapPage>#rekapSummary,body.print-tilawah #rekapPage>.section{display:none!important}
+body.print-tilawah #appPage,body.print-tilawah .main,body.print-tilawah .content,body.print-tilawah #rekapPage,body.print-tilawah #laporanTilawahSection{display:block!important}
+body.print-tilawah .main{margin:0!important;width:100%!important}
+body.print-tilawah .content{padding:0!important;max-width:none!important}
+body.print-tilawah #laporanTilawahSection{margin:0!important;border:0!important;box-shadow:none!important;padding:0!important}
+body.print-tilawah #laporanTilawahDetailSection{display:none!important}
+body.print-tilawah .report-summary{display:none!important}
+body.print-tilawah .no-print{display:none!important}
+body.print-tilawah .print-only{display:block!important}
+body.print-tilawah table{min-width:0;width:100%;font-size:8.5px}
+body.print-tilawah th,body.print-tilawah td{padding:5px}
+
+body.print-pengajian #loginPage,body.print-pengajian .sidebar,body.print-pengajian .top,body.print-pengajian #dashboardPage,body.print-pengajian #tilawahPage,body.print-pengajian #hutangPage,body.print-pengajian #pengajianPage,body.print-pengajian #laporanTilawahSection,body.print-pengajian #rekapPage>.section-head,body.print-pengajian #rekapPage>.form-card,body.print-pengajian #rekapPage>#rekapSummary,body.print-pengajian #rekapPage>.section{display:none!important}
+body.print-pengajian #appPage,body.print-pengajian .main,body.print-pengajian .content,body.print-pengajian #rekapPage,body.print-pengajian #laporanPengajianSection{display:block!important}
+body.print-pengajian .main{margin:0!important;width:100%!important}
+body.print-pengajian .content{padding:0!important;max-width:none!important}
+body.print-pengajian #laporanPengajianSection{margin:0!important;border:0!important;box-shadow:none!important;padding:0!important}
+body.print-pengajian #laporanPengajianDetailSection{display:none!important}
+body.print-pengajian .report-summary{display:none!important}
+body.print-pengajian .no-print{display:none!important}
+body.print-pengajian .print-only{display:block!important}
+body.print-pengajian table{min-width:0;width:100%;font-size:8.5px}
+body.print-pengajian th,body.print-pengajian td{padding:5px}
+}
+/* V10 - Rekap dan Laporan dipisahkan */
+#laporanPage .report-card{margin-top:18px}
+#rekapPage .section{margin-top:18px}
+#laporanPage .rekap-toolbar,#rekapPage .rekap-toolbar{margin-bottom:18px}
+@media(max-width:900px){.rekap-toolbar{flex-direction:column;align-items:flex-start}.rekap-toolbar-actions{width:100%;display:flex;flex-wrap:wrap}.rekap-toolbar-actions button{flex:1;min-width:160px}}
+
+<style>
+.akun-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-top:14px}.akun-actions button{min-width:170px}.akun-selected{padding:10px 12px;border:1px solid #d9e3e8;border-radius:10px;background:#f8fbfc;min-width:260px}.akun-table tr.akun-row{cursor:pointer}.akun-table tr.akun-row:hover{background:#f7fbfb}.akun-table tr.akun-selected-row{background:#e8f7f4;outline:2px solid #0f766e;outline-offset:-2px}.akun-progress{margin-top:10px;font-size:13px;color:#64748b;white-space:pre-wrap}
+<style>
+/* V29: peserta akun guru selalu terkunci ke dirinya sendiri */
+.guru-self-locked #pesertaSearch,
+.guru-self-locked #personResults { display:none !important; }
+.guru-self-locked #selectedPerson { display:block !important; }
+</style>
+</style>
+</style>
+
+<style>
+:root{
+ --sid-green:#0f766e;--sid-green2:#14b8a6;--sid-navy:#12304a;--sid-bg:#f4f8fb;
+ --sid-card:#ffffff;--sid-muted:#718096;--sid-shadow:0 14px 38px rgba(15,50,70,.08);
+}
+body{background:linear-gradient(135deg,#f5fafb 0%,#eef5f8 55%,#f8fbfd 100%);color:var(--sid-navy)}
+.sidebar{background:linear-gradient(180deg,#0b716a 0%,#075e59 100%);box-shadow:12px 0 35px rgba(4,70,67,.16)}
+.side-brand{font-size:20px!important;letter-spacing:.2px}
+.side-brand small{opacity:.78}
+.nav button{border-radius:14px!important;margin:4px 8px!important;padding:12px 14px!important;transition:.2s ease}
+.nav button:hover{background:rgba(255,255,255,.13)!important;transform:translateX(3px)}
+.nav button.active{background:rgba(255,255,255,.18)!important;box-shadow:inset 3px 0 0 #8ff3df}
+.top{background:rgba(255,255,255,.88)!important;backdrop-filter:blur(14px);border-bottom:1px solid #e7eef2!important}
+.content{padding-top:28px!important}
+.hero-card{display:flex;justify-content:space-between;align-items:center;padding:28px 30px;border-radius:24px;background:linear-gradient(135deg,#ffffff 0%,#e9f9f6 100%);box-shadow:var(--sid-shadow);border:1px solid #e4f0ef;margin-bottom:20px;overflow:hidden;position:relative}
+.hero-card:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;right:-90px;top:-120px;background:rgba(20,184,166,.11)}
+.hero-card.compact{padding:22px 28px}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--sid-green);margin-bottom:7px}
+.hero-card h1,.hero-card h2{margin:0 0 6px;color:#12304a}
+.hero-card p{margin:0;color:var(--sid-muted)}
+.program-chip{z-index:1;padding:9px 15px;border-radius:999px;background:#fff2f2;color:#c24141;font-size:12px;font-weight:800;box-shadow:0 5px 16px rgba(0,0,0,.05)}
+.hero-count{z-index:1;text-align:center;background:#fff;border-radius:18px;padding:12px 20px;box-shadow:0 8px 24px rgba(15,50,70,.07)}
+.hero-count strong{display:block;font-size:28px;color:var(--sid-green)}
+.hero-count span{font-size:11px;color:var(--sid-muted)}
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.dash-stat{display:flex;align-items:center;gap:14px;padding:18px;border-radius:20px;background:#fff;box-shadow:var(--sid-shadow);border:1px solid #e9eff2}
+.dash-icon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:22px}
+.dash-stat.blue .dash-icon{background:#e8f1ff}.dash-stat.green .dash-icon{background:#e6f8f1}.dash-stat.orange .dash-icon{background:#fff3df}.dash-stat.purple .dash-icon{background:#f1ebff}
+.dash-stat small,.dash-stat em{display:block;color:var(--sid-muted);font-size:11px;font-style:normal}
+.dash-stat strong{display:block;font-size:25px;line-height:1.15;margin:3px 0;color:#12304a}
+.dash-columns{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-bottom:20px}
+.dash-panel{background:#fff;border:1px solid #e9eff2;border-radius:22px;padding:22px;box-shadow:var(--sid-shadow)}
+.panel-title{display:flex;gap:12px;align-items:center;margin-bottom:18px}.panel-title>span{font-size:22px}.panel-title h3{margin:0;font-size:16px}.panel-title p{margin:3px 0 0;color:var(--sid-muted);font-size:11px}
+.progress-wrap{display:flex;align-items:center;gap:24px}.progress-ring{width:118px;height:118px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--sid-green2) 0deg,#e7eef0 0deg);position:relative}.progress-ring:after{content:"";position:absolute;inset:9px;border-radius:50%;background:#fff}.progress-ring span{position:relative;z-index:1;font-weight:800;font-size:20px;color:var(--sid-green)}
+.progress-copy strong{display:block;font-size:17px}.progress-copy span{display:block;margin-top:6px;color:var(--sid-muted);font-size:12px}
+.status-list{display:grid;gap:0}.status-list>div{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #edf2f4;font-size:12px}.status-list>div:last-child{border-bottom:0}.status-list span{color:var(--sid-muted)}.status-list b{color:#12304a}
+.quick-actions{display:grid;grid-template-columns:repeat(5,1fr);gap:13px}.quick-actions button{border:0;border-radius:18px;padding:17px 12px;text-align:left;background:#fff;box-shadow:var(--sid-shadow);cursor:pointer;transition:.2s;border:1px solid #e8eef1}.quick-actions button:hover{transform:translateY(-3px);box-shadow:0 18px 38px rgba(15,50,70,.12)}.quick-actions button:first-child{background:linear-gradient(135deg,#1678ed,#2997ff);color:#fff}.quick-actions button:nth-child(2){background:linear-gradient(135deg,#f59e0b,#fb923c);color:#fff}.quick-actions button:nth-child(3){background:linear-gradient(135deg,#0f8f80,#18b89f);color:#fff}.quick-actions button:nth-child(4){background:linear-gradient(135deg,#7255db,#9477ed);color:#fff}.quick-actions button:nth-child(5){background:linear-gradient(135deg,#e45d67,#f07880);color:#fff}.quick-actions span{display:block;font-weight:800;margin-top:7px}.quick-actions small{opacity:.8}
+.modern-table thead th{background:#f5f9fa!important;color:#557084!important;font-size:11px!important}.modern-table tbody tr:hover{background:#f8fcfc}.peserta-filter{margin-bottom:16px}
+@media(max-width:1050px){.dash-grid{grid-template-columns:repeat(2,1fr)}.quick-actions{grid-template-columns:repeat(3,1fr)}.dash-columns{grid-template-columns:1fr}}
+@media(max-width:650px){.hero-card{align-items:flex-start;gap:15px;flex-direction:column}.dash-grid{grid-template-columns:1fr}.quick-actions{grid-template-columns:1fr 1fr}.progress-wrap{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+<section id="loginPage" class="login"><div class="login-card"><div class="brand"><div class="logo">S</div><h1>SIDOJI Matahati</h1><p>Presensi Tilawah & Pengajian</p></div><form id="loginForm"><label>Username / Email</label><input id="email" type="text" autocomplete="username" placeholder="Email admin atau username guru" required><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Password" required><button class="btn-primary" type="submit">Masuk</button><div class="mini" style="margin-top:8px">Admin: email • Guru: username</div><div id="loginMsg" class="msg hidden"></div></form></div></section>
+<section id="appPage" class="app hidden"><aside class="sidebar"><div class="side-brand">SIDOJI Matahati<small>Presensi Tilawah & Pengajian</small></div><nav class="nav"><button data-page="dashboard">🏠 Dashboard</button><button data-page="peserta">👥 Peserta</button><button class="active" data-page="tilawah">📖 Tilawah</button><button data-page="hutang">💳 Hutang</button><button data-page="pengajian">🕌 Pengajian</button><button data-page="rekap">📊 Rekap</button><button data-page="laporan">📑 Laporan</button><button data-page="akun">👨‍🏫 Akun Guru</button><button data-page="pengaturan">⚙️ Pengaturan</button></nav><button id="logoutBtn" style="width:100%;margin-top:20px;background:#ffffff18;color:#fff">Keluar</button></aside>
+<main class="main"><header class="top"><div><h2 id="pageTitle">Tilawah</h2></div><div class="user" id="userInfo">Memuat...</div></header><div class="content">
+
+<div id="dashboardPage" class="hidden">
+  <div class="hero-card">
+    <div>
+      <div class="eyebrow">SIDOJI MATAHATI</div>
+      <h1 id="dashGreeting">Assalamu'alaikum 👋</h1>
+      <p id="dashSubtitle">Semoga hari ini penuh keberkahan dan kemudahan.</p>
+    </div>
+    <div class="program-chip" id="dashProgramStatus">PROGRAM NONAKTIF</div>
+  </div>
+
+  <div class="dash-grid" id="adminDashStats">
+    <div class="dash-stat blue"><span class="dash-icon">👥</span><div><small>Total Peserta</small><strong id="dashTotalPeserta">0</strong><em>Guru & Staff</em></div></div>
+    <div class="dash-stat green"><span class="dash-icon">📖</span><div><small>Tilawah Hari Ini</small><strong id="dashTilawahHari">0</strong><em>Peserta selesai</em></div></div>
+    <div class="dash-stat orange"><span class="dash-icon">⏳</span><div><small>Hutang Saat Ini</small><strong id="dashHutang">0</strong><em>Juz</em></div></div>
+    <div class="dash-stat purple"><span class="dash-icon">🕌</span><div><small>Pengajian Hari Ini</small><strong id="dashPengajian">0</strong><em>Presensi</em></div></div>
+  </div>
+
+  <div class="dash-grid guru-stats hidden" id="guruDashStats">
+    <div class="dash-stat green"><span class="dash-icon">📖</span><div><small>Tilawah Hari Ini</small><strong id="guruDashTilawah">0 / 1</strong><em>Target harian</em></div></div>
+    <div class="dash-stat orange"><span class="dash-icon">⏳</span><div><small>Saldo Hutang</small><strong id="guruDashHutang">0</strong><em>Juz</em></div></div>
+    <div class="dash-stat blue"><span class="dash-icon">📚</span><div><small>Total Tilawah</small><strong id="guruDashTotalJuz">0</strong><em>Juz</em></div></div>
+    <div class="dash-stat purple"><span class="dash-icon">🕌</span><div><small>Pengajian</small><strong id="guruDashPengajian">0</strong><em>Kehadiran</em></div></div>
+  </div>
+
+  <div class="dash-columns">
+    <div class="dash-panel">
+      <div class="panel-title"><span>📊</span><div><h3>Progress SIDOJI</h3><p>Ringkasan pelaksanaan hari ini</p></div></div>
+      <div class="progress-wrap"><div class="progress-ring" id="dashProgressRing"><span id="dashProgressPct">0%</span></div><div class="progress-copy"><strong id="dashProgressLabel">Belum ada tilawah</strong><span id="dashProgressText">Program belum aktif.</span></div></div>
+    </div>
+    <div class="dash-panel">
+      <div class="panel-title"><span>⚙️</span><div><h3>Status Program</h3><p>Pengaturan utama SIDOJI</p></div></div>
+      <div class="status-list">
+        <div><span>Program</span><b id="dashProgramName">SIDOJI Matahati</b></div>
+        <div><span>Tanggal Mulai</span><b id="dashStartDate">Belum ditentukan</b></div>
+        <div><span>Kewajiban Harian</span><b>1 Juz</b></div>
+        <div><span>Status</span><b id="dashStatusText">NONAKTIF</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-actions" id="adminQuickActions">
+    <button data-dash-action="tilawah">📖 <span>Input Tilawah</span><small>Catat Tilawah</small></button>
+    <button data-dash-action="pengajian">🕌 <span>Input Pengajian</span><small>Presensi</small></button>
+    <button data-dash-action="rekap">📊 <span>Lihat Rekap</span><small>Monitoring</small></button>
+    <button data-dash-action="peserta">👥 <span>Kelola Peserta</span><small>111 Peserta</small></button>
+    <button data-dash-action="pengaturan">⚙️ <span>Pengaturan</span><small>Program</small></button>
+  </div>
+</div>
+
+<div id="pesertaPage" class="hidden">
+  <div class="hero-card compact">
+    <div><div class="eyebrow">MANAJEMEN PESERTA</div><h2>Peserta SIDOJI</h2><p>Kelola dan pantau seluruh guru & staff dalam satu tampilan.</p></div>
+    <div class="hero-count"><strong id="pesertaCount">0</strong><span>Total Peserta</span></div>
+  </div>
+  <div class="form-card peserta-filter"><label>🔎 Cari Peserta</label><input id="pesertaPageSearch" placeholder="Nama, kode, jabatan, atau lembaga..."></div>
+  <div class="section">
+    <div class="table-wrap"><table class="modern-table"><thead><tr><th>No</th><th>Kode</th><th>Nama Peserta</th><th>Lembaga</th><th>Jabatan</th><th>Status</th></tr></thead><tbody id="pesertaPageBody"><tr><td colspan="6" class="empty">Memuat peserta...</td></tr></tbody></table></div>
+  </div>
+</div>
+
+<div id="tilawahPage" class="hidden"><div class="section-head"><div><h3>Input Tilawah</h3><div class="mini">Satu hari wajib minimal 1 Juz. Juz tambahan digunakan untuk membayar hutang sebelumnya.</div></div><button class="btn-light" id="refreshTilawahBtn">↻ Muat Ulang</button></div><div class="form-grid"><div class="form-card"><label>Peserta</label><input id="pesertaSearch" placeholder="Ketik nama atau kode peserta..." autocomplete="off"><div id="personResults" class="search-results hidden"></div><div id="selectedPerson" class="selected-person hidden"></div><input id="selectedPesertaId" type="hidden"><label>Tanggal</label><input id="tilawahTanggal" type="date"><label>Juz yang dibaca</label><div class="juz-grid" id="juzGrid"></div><div class="hint">Bisa memilih lebih dari satu Juz pada hari yang sama. Juz yang sama tidak dapat disimpan dua kali.</div><label>Keterangan</label><input id="tilawahKeterangan" placeholder="Opsional"><div class="actions"><button class="btn-light" id="clearTilawahBtn">Bersihkan</button><button class="btn-primary" id="saveTilawahBtn">Simpan Tilawah</button></div></div><div class="form-card"><h3 style="margin-top:0">Ringkasan Input</h3><div class="label">Peserta</div><div id="summaryPerson" style="font-weight:700;margin-top:5px">Belum dipilih</div><div class="label" style="margin-top:18px">Tanggal</div><div id="summaryDate" style="font-weight:700;margin-top:5px">-</div><div class="label" style="margin-top:18px">Jumlah Juz Dipilih</div><div id="summaryJuz" class="value" style="font-size:28px">0</div><div id="summaryLimit" class="hint">Batas hari ini: 0 Juz • Sudah tersimpan: 0 • Sisa boleh: 0</div><div class="hint">1 Juz untuk kewajiban hari ini. Juz tambahan digunakan untuk membayar hutang sebelumnya.</div></div></div><div class="section"><div class="section-head"><h3>Riwayat Tilawah</h3><input id="tilawahListSearch" style="max-width:300px" placeholder="Cari peserta..."></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Kode</th><th>Peserta</th><th>Lembaga</th><th>Juz</th><th>Status</th><th>Keterangan</th></tr></thead><tbody id="tilawahBody"><tr><td colspan="7" class="empty">Memuat...</td></tr></tbody></table></div></div></div>
+
+<div id="rekapPage" class="hidden">
+<div class="rekap-toolbar no-print">
+  <div class="rekap-heading"><h3>📊 Rekap SIDOJI</h3><div class="mini">Rekap cepat Tilawah dan Pengajian berdasarkan periode.</div></div>
+  <div class="rekap-toolbar-actions">
+    <button class="btn-light" id="refreshRekapBtn">↻ Muat Ulang</button>
+  </div>
+</div>
+<div class="form-card">
+    <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr 1fr">
+      <div><label>Periode</label>
+        <select id="rekapPeriode">
+          <option value="harian">Harian</option>
+          <option value="bulanan" selected>Bulanan</option>
+          <option value="tahunan">Tahunan</option>
+        </select>
+      </div>
+      <div><label>Tanggal</label><input id="rekapTanggal" type="date"></div>
+      <div><label>Bulan</label><input id="rekapBulan" type="month"></div>
+      <div><label>Tahun</label><input id="rekapTahun" type="number" min="2020" max="2100"></div>
+    </div>
+    <div class="actions"><button class="btn-primary" id="tampilkanRekapBtn">🔎 Tampilkan Rekap</button></div>
+  </div>
+
+  <div class="hutang-summary" id="rekapSummary">
+    <div class="hutang-box"><div class="label" id="lblTotalPeserta">Total Peserta</div><div class="n" id="rekapTotalPeserta">0</div></div>
+    <div class="hutang-box"><div class="label" id="lblSelesai">Hari Tilawah</div><div class="n" id="rekapSelesai">0</div></div>
+    <div class="hutang-box"><div class="label" id="lblBelum">Belum Tilawah</div><div class="n" id="rekapBelum">0</div></div>
+    <div class="hutang-box"><div class="label">Total Tilawah</div><div class="n" id="rekapTotalJuz">0 Juz</div></div>
+    <div class="hutang-box"><div class="label">Hutang Periode</div><div class="n" id="rekapHutangPeriode">0 Juz</div></div>
+    <div class="hutang-box"><div class="label">Saldo Hutang</div><div class="n" id="rekapTotalHutang">0 Juz</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h3 id="rekapPesertaTitle">Rekap Per Peserta</h3></div>
+    <div class="table-wrap"><table>
+      <thead id="rekapPesertaHead"><tr><th>No</th><th>Kode</th><th>Peserta</th><th>Lembaga</th><th>Hari Wajib</th><th>Hari Tilawah</th><th>Total Juz</th><th>Hutang Periode</th><th>Saldo Hutang</th><th>% Tilawah</th></tr></thead>
+      <tbody id="rekapPesertaBody"><tr><td colspan="10" class="empty">Silakan pilih periode.</td></tr></tbody>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h3>Detail Tilawah</h3></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Tanggal</th><th>Kode</th><th>Peserta</th><th>Lembaga</th><th>Juz</th><th>Status</th><th>Keterangan</th></tr></thead>
+      <tbody id="rekapDetailBody"><tr><td colspan="7" class="empty">Silakan pilih periode.</td></tr></tbody>
+    </table></div>
+  </div>
+</div>
+<div id="laporanPage" class="hidden">
+<div class="rekap-toolbar no-print">
+  <div class="rekap-heading"><h3>📑 Laporan SIDOJI</h3><div class="mini">Laporan resmi per guru/peserta yang siap dicetak.</div></div>
+  <div class="rekap-toolbar-actions">
+    <button class="btn-primary" id="cetakRekapTilawahTopBtn">🖨️ Cetak Tilawah</button>
+    <button class="btn-primary" id="cetakRekapPengajianTopBtn">🖨️ Cetak Pengajian</button>
+    <button class="btn-light" id="refreshLaporanBtn">↻ Muat Ulang</button>
+  </div>
+</div>
+<div id="laporanTilawahSection" class="report-card">
+<div class="section-head report-head"><div><h3 class="report-title">📖 Laporan Tilawah</h3><div class="report-sub">Rekap Tilawah dan Hutang seluruh peserta.</div></div><div class="actions report-actions no-print"><button class="btn-light" id="refreshLaporanTilawahBtn">↻ Refresh</button></div></div>
+<div class="form-card no-print report-filter-card"><div class="form-grid report-filter-grid">
+<div><label>Periode</label><select id="laporanTilawahPeriode"><option value="harian">Harian</option><option value="bulanan" selected>Bulanan</option><option value="tahunan">Tahunan</option></select></div>
+<div><label>Tanggal</label><input id="laporanTilawahTanggal" type="date"></div><div><label>Bulan</label><input id="laporanTilawahBulan" type="month"></div><div><label>Tahun</label><input id="laporanTilawahTahun" type="number" min="2020" max="2100"></div>
+<div><label>Lembaga</label><select id="laporanTilawahLembaga"><option value="">Semua Lembaga</option></select></div></div>
+<div class="actions"><button class="btn-primary" id="tampilkanLaporanTilawahBtn">🔎 Tampilkan Laporan Tilawah</button></div></div>
+<div class="print-only report-print-header"><div class="school-name">SIDOJI MATAHATI</div><div class="report-name">LAPORAN TILAWAH</div><div id="printTilawahPeriode"></div><div id="printTilawahLembaga"></div></div>
+<div class="hutang-summary report-summary">
+<div class="hutang-box"><div class="label">Total Peserta</div><div class="n" id="laporanTilawahTotalPeserta">0</div></div><div class="hutang-box"><div class="label">Hari Tilawah</div><div class="n" id="laporanTilawahSelesai">0</div></div><div class="hutang-box"><div class="label">Belum Tilawah</div><div class="n" id="laporanTilawahBelum">0</div></div><div class="hutang-box"><div class="label">Total Juz</div><div class="n" id="laporanTilawahTotalJuz">0 Juz</div></div><div class="hutang-box"><div class="label">Hutang Periode</div><div class="n" id="laporanTilawahHutangPeriode">0 Juz</div></div><div class="hutang-box"><div class="label">Saldo Hutang</div><div class="n" id="laporanTilawahSaldoHutang">0 Juz</div></div></div>
+<div class="section"><div class="section-head"><h3>Rekap Tilawah Per Peserta</h3></div><div class="table-wrap"><table><thead id="laporanTilawahHead"><tr><th>No</th><th>Kode</th><th>Peserta</th><th>Lembaga</th><th>Hari Wajib</th><th>Hari Tilawah</th><th>Total Juz</th><th>Hutang</th><th>Saldo Hutang</th><th>% Tilawah</th><th>Status</th></tr></thead><tbody id="laporanTilawahBody"><tr><td colspan="11" class="empty">Silakan tampilkan laporan.</td></tr></tbody></table></div></div>
+<div id="laporanTilawahDetailSection" class="section"><div class="section-head"><h3>Detail Tilawah</h3></div><div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Kode</th><th>Peserta</th><th>Lembaga</th><th>Juz</th><th>Status</th><th>Keterangan</th></tr></thead><tbody id="laporanTilawahDetailBody"><tr><td colspan="7" class="empty">Silakan tampilkan laporan.</td></tr></tbody></table></div></div>
+</div>
+<div id="laporanPengajianSection" class="report-card">
+<div class="section-head report-head"><div><h3 class="report-title">🕌 Laporan Pengajian</h3><div class="report-sub">Rekap kehadiran pengajian seluruh peserta.</div></div><div class="actions report-actions no-print"><button class="btn-light" id="refreshLaporanPengajianBtn">↻ Refresh</button></div></div>
+<div class="form-card no-print report-filter-card"><div class="form-grid report-filter-grid">
+<div><label>Tanggal Mulai</label><input id="laporanPengajianMulai" type="date"></div><div><label>Tanggal Selesai</label><input id="laporanPengajianSelesai" type="date"></div><div><label>Jenis Pengajian</label><select id="laporanPengajianJenis"><option value="">Semua</option><option value="Mingguan">Mingguan</option><option value="Bulanan">Bulanan</option></select></div><div><label>Lembaga</label><select id="laporanPengajianLembaga"><option value="">Semua Lembaga</option></select></div></div>
+<div class="actions"><button class="btn-primary" id="tampilkanLaporanPengajianBtn">🔎 Tampilkan Laporan Pengajian</button></div></div>
+<div class="print-only report-print-header"><div class="school-name">SIDOJI MATAHATI</div><div class="report-name">LAPORAN PENGAJIAN</div><div id="printPengajianPeriode"></div><div id="printPengajianLembaga"></div></div>
+<div class="hutang-summary report-summary">
+<div class="hutang-box"><div class="label">Total Peserta</div><div class="n" id="laporanPengajianTotalPeserta">0</div></div><div class="hutang-box"><div class="label">Hadir</div><div class="n" id="laporanPengajianHadir">0</div></div><div class="hutang-box"><div class="label">Izin</div><div class="n" id="laporanPengajianIzin">0</div></div><div class="hutang-box"><div class="label">Sakit</div><div class="n" id="laporanPengajianSakit">0</div></div><div class="hutang-box"><div class="label">Alpa</div><div class="n" id="laporanPengajianAlpa">0</div></div><div class="hutang-box"><div class="label">Kehadiran</div><div class="n" id="laporanPengajianPersentase">0.00%</div></div></div>
+<div class="section"><div class="section-head"><h3>Rekap Pengajian Per Peserta</h3></div><div class="table-wrap"><table><thead><tr><th>No</th><th>Kode</th><th>Peserta</th><th>Lembaga</th><th>Hadir</th><th>Izin</th><th>Sakit</th><th>Alpa</th><th>Total</th><th>Status</th><th>% Hadir</th></tr></thead><tbody id="laporanPengajianBody"><tr><td colspan="11" class="empty">Silakan tampilkan laporan.</td></tr></tbody></table></div></div>
+
+</div>
+</div>
+<div id="globalReportSection" class="section global-report">
+<div id="pengajianPage" class="hidden">
+  <div class="section-head">
+    <div><h3>🕌 Presensi Pengajian</h3><div class="mini">Catat kehadiran pengajian mingguan atau bulanan.</div></div>
+    <button class="btn-light" id="refreshPengajianBtn">↻ Muat Ulang</button>
+  </div>
+  <div class="pengajian-grid">
+    <div class="form-card">
+      <label>Peserta</label>
+      <input id="pengajianSearch" placeholder="Ketik nama atau kode peserta..." autocomplete="off">
+      <div id="pengajianResults" class="search-results hidden"></div>
+      <div id="pengajianSelected" class="selected-person hidden"></div>
+      <input id="pengajianPesertaId" type="hidden">
+      <label>Tanggal</label>
+      <input id="pengajianTanggal" type="date">
+      <label>Jenis Pengajian</label>
+      <select id="pengajianJenis"><option value="Mingguan">Mingguan</option><option value="Bulanan">Bulanan</option></select>
+      <label>Status Kehadiran</label>
+      <div class="pengajian-status">
+        <label><input type="radio" name="pengajianStatus" value="Hadir" checked> Hadir</label>
+        <label><input type="radio" name="pengajianStatus" value="Izin"> Izin</label>
+        <label><input type="radio" name="pengajianStatus" value="Sakit"> Sakit</label>
+        <label><input type="radio" name="pengajianStatus" value="Alpa"> Alpa</label>
+      </div>
+      <label>Keterangan</label>
+      <input id="pengajianKeterangan" placeholder="Opsional">
+      <div class="actions"><button class="btn-light" id="clearPengajianBtn">Bersihkan</button><button class="btn-primary" id="savePengajianBtn">💾 Simpan Presensi</button></div>
+      <div id="pengajianMsg" class="hint"></div>
+    </div>
+    <div class="form-card">
+      <h3 style="margin-top:0">Ringkasan Input</h3>
+      <div class="label">Peserta</div><div id="pengajianSummaryPerson" style="font-weight:700;margin-top:5px">Belum dipilih</div>
+      <div class="label" style="margin-top:18px">Tanggal</div><div id="pengajianSummaryDate" style="font-weight:700;margin-top:5px">-</div>
+      <div class="label" style="margin-top:18px">Jenis</div><div id="pengajianSummaryJenis" style="font-weight:700;margin-top:5px">Mingguan</div>
+      <div class="label" style="margin-top:18px">Status</div><div id="pengajianSummaryStatus" class="value" style="font-size:26px">Hadir</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-head"><h3>Riwayat Pengajian</h3><input id="pengajianListSearch" style="max-width:300px" placeholder="Cari peserta..."></div>
+    <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Kode</th><th>Peserta</th><th>Lembaga</th><th>Jenis</th><th>Status</th><th>Keterangan</th></tr></thead><tbody id="pengajianBody"><tr><td colspan="7" class="empty">Memuat...</td></tr></tbody></table></div>
+  </div>
+
+
+</div>
+
+<div id="pengaturanPage" class="hidden">
+  <div class="section-head">
+    <div>
+      <h3>⚙️ Pengaturan Program SIDOJI</h3>
+      <div class="mini">Pengaturan ini hanya dapat diubah oleh Administrator. Tanggal mulai menjadi acuan utama Tilawah dan saldo hutang SIDOJI.</div>
+    </div>
+    <span id="programStatusBadge" class="status-badge status-belum">PROGRAM BELUM AKTIF</span>
+  </div>
+
+  <div class="form-card">
+    <div class="form-grid" style="grid-template-columns:1.4fr 1fr 1fr">
+      <div>
+        <label>Nama Program</label>
+        <input id="settingNamaProgram" value="SIDOJI Matahati" placeholder="Nama program">
+      </div>
+      <div>
+        <label>Tanggal Mulai Program</label>
+        <input id="settingTanggalMulai" type="date">
+      </div>
+      <div>
+        <label>Status Program</label>
+        <label style="display:flex;align-items:center;gap:10px;margin-top:10px;font-weight:700">
+          <input id="settingProgramAktif" type="checkbox" style="width:20px;height:20px">
+          Program Aktif
+        </label>
+      </div>
+    </div>
+
+    <label style="margin-top:16px">Keterangan</label>
+    <textarea id="settingKeterangan" rows="3" placeholder="Catatan tentang awal pelaksanaan program SIDOJI..."></textarea>
+
+    <div class="actions">
+      <button class="btn-primary" id="simpanPengaturanBtn">💾 Simpan Pengaturan</button>
+      <button class="btn-light" id="aktifkanProgramBtn">🚀 Aktifkan Program SIDOJI</button>
+    </div>
+
+    <div id="pengaturanMsg" class="hint"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <div>
+        <h3>Status Pelaksanaan</h3>
+        <div class="mini">Guru dan peserta hanya dapat melakukan presensi setelah program aktif dan tanggal sudah mencapai tanggal mulai.</div>
+      </div>
+    </div>
+    <div class="summary-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="summary-card"><div class="label">Nama Program</div><div id="statusNamaProgram" class="value" style="font-size:20px">-</div></div>
+      <div class="summary-card"><div class="label">Tanggal Mulai</div><div id="statusTanggalMulai" class="value" style="font-size:20px">-</div></div>
+      <div class="summary-card"><div class="label">Status</div><div id="statusProgramText" class="value" style="font-size:20px">BELUM AKTIF</div></div>
+    </div>
+  </div>
+</div>
+<div id="akunPage" class="hidden">
+  <div class="section-head"><div><h3>👨‍🏫 Akun Guru</h3><div class="mini">Khusus 104 guru aktif. Akun pegawai, sopir, dan yayasan tidak ditampilkan di halaman ini.</div></div><button class="btn-light" id="refreshAkunBtn">↻ Muat Ulang</button></div>
+  <div class="form-card">
+    <div class="form-grid" style="grid-template-columns:1.3fr 1fr 1fr">
+      <div><label>Cari Guru</label><input id="akunGuruSearch" placeholder="Nama, kode, atau lembaga..."></div>
+      <div><label>Guru Terpilih</label><div class="akun-selected" id="akunSelectedInfo">Belum memilih peserta</div></div>
+      <div><label>Password Awal</label><input id="akunPassword" type="password" value="12345678" minlength="6" autocomplete="new-password"></div>
+    </div>
+    <div class="akun-actions">
+      <button class="btn-primary" id="buatAkunTerpilihBtn">🔐 Buat/Perbaiki Akun Terpilih</button>
+      <button class="btn-light" id="buatSemuaAkunBtn">🔐 Buat Semua Akun Guru</button>
+      <button class="btn-light" id="bersihkanAkunBtn">🧹 Sinkronkan Akun Lama</button>
+    </div>
+    <div class="hint">Username otomatis dari nama tanpa gelar. Admin login memakai email; guru login memakai username + password. Password awal: 12345678.</div>
+    <div class="akun-progress" id="akunProgress"></div>
+  </div>
+  <div class="section"><div class="section-head"><h3>Daftar Guru</h3><span class="mini" id="akunGuruInfo">Memuat...</span></div>
+    <div class="table-wrap"><table class="akun-table"><thead><tr><th>No</th><th>Nama</th><th>Username</th><th>Kode</th><th>Lembaga</th><th>Jabatan</th><th>Role</th><th>Status Akun</th></tr></thead><tbody id="akunGuruBody"><tr><td colspan="8" class="empty">Memuat...</td></tr></tbody></table></div>
+  </div>
+</div>
+<div id="placeholderPage" class="hidden"><div class="card"><h3 id="placeholderTitle">Menu</h3><p style="color:var(--muted)">Menu ini akan kita bangun setelah modul yang sedang diuji selesai.</p></div></div>
+<div id="hutangPage" class="hidden">
+  <div class="section-head">
+    <div><h3>Hutang Tilawah</h3><div class="mini">Setiap peserta memiliki saldo hutang masing-masing. Pembayaran wajib memilih Juz secara berurutan.</div></div>
+    <button class="btn-light" id="refreshHutangBtn">↻ Muat Ulang</button>
+  </div>
+  <div class="section">
+    <div class="form-card">
+      <label>Cari Peserta</label>
+      <input id="hutangSearch" placeholder="Ketik nama atau kode peserta...">
+    </div>
+  </div>
+  <div class="section">
+    <div class="table-wrap"><table>
+      <thead><tr><th>No</th><th>Kode</th><th>Peserta</th><th>Lembaga</th><th>Hutang</th><th>Aksi</th></tr></thead>
+      <tbody id="hutangBody"><tr><td colspan="6" class="empty">Memuat...</td></tr></tbody>
+    </table></div>
+  </div>
+  <div id="bayarHutangPanel" class="section hidden"></div>
+</div>
+</div></main></section><div id="toast" class="toast hidden"></div>
+<script>
+const SUPABASE_URL='https://vvrlnraqasjsxyonirti.supabase.co';
+const SUPABASE_KEY='sb_publishable_1dP5IefJnaJIMJlK5W5jug_Sn7OjXVW';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);const $=id=>document.getElementById(id);
+function toast(msg){$('toast').textContent=msg;$('toast').classList.remove('hidden');setTimeout(()=>$('toast').classList.add('hidden'),2800)}
+function showLoginMsg(msg,ok=false){$('loginMsg').textContent=msg;$('loginMsg').className='msg '+(ok?'ok':'');$('loginMsg').classList.remove('hidden')}
+function esc(v){return String(v??'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
+function today(){return new Date().toISOString().slice(0,10)}
+let currentUser=null;
+let currentProfile=null;
+let currentRole='admin';
+let currentPesertaId=null;
+let programConfig={aktif:false,tanggal_mulai:'',nama_program:'SIDOJI Matahati',keterangan:''};
+
+function programSudahDimulai(){
+  if(!programConfig.aktif || !programConfig.tanggal_mulai) return false;
+  return today() >= String(programConfig.tanggal_mulai);
+}
+function formatTanggalID(v){
+  if(!v)return '-';
+  const d=new Date(String(v)+'T00:00:00');
+  return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'});
+}
+function renderProgramSettings(){
+  const aktif=!!programConfig.aktif, mulai=programConfig.tanggal_mulai||'';
+  if($('settingNamaProgram'))$('settingNamaProgram').value=programConfig.nama_program||'SIDOJI Matahati';
+  if($('settingTanggalMulai'))$('settingTanggalMulai').value=mulai;
+  if($('settingProgramAktif'))$('settingProgramAktif').checked=aktif;
+  if($('settingKeterangan'))$('settingKeterangan').value=programConfig.keterangan||'';
+  if($('statusNamaProgram'))$('statusNamaProgram').textContent=programConfig.nama_program||'SIDOJI Matahati';
+  if($('statusTanggalMulai'))$('statusTanggalMulai').textContent=formatTanggalID(mulai);
+  if($('statusProgramText'))$('statusProgramText').textContent=aktif?(programSudahDimulai()?'AKTIF':'MENUNGGU TANGGAL MULAI'):'BELUM AKTIF';
+  const badge=$('programStatusBadge');
+  if(badge){
+    badge.className='status-badge '+(aktif&&programSudahDimulai()?'status-hadir':aktif?'status-izin':'status-belum');
+    badge.textContent=aktif?(programSudahDimulai()?'PROGRAM AKTIF':'MENUNGGU TANGGAL MULAI'):'PROGRAM BELUM AKTIF';
+  }
+}
+async function loadProgramSettings(){
+  // Satu sumber pengaturan: public.pengaturan_program
+  const {data,error}=await sb.from('pengaturan_program')
+    .select('id,nama_program,status_program,tanggal_mulai')
+    .order('tanggal_mulai',{ascending:false})
+    .limit(1)
+    .maybeSingle();
+
+  if(error){
+    console.warn('[SIDOJI SETTINGS]',error.message);
+    programConfig={aktif:false,tanggal_mulai:'',nama_program:'SIDOJI Matahati',keterangan:''};
+    renderProgramSettings();
+    return;
+  }
+
+  if(data){
+    programConfig={
+      aktif:String(data.status_program||'').toUpperCase()==='AKTIF',
+      tanggal_mulai:data.tanggal_mulai||'',
+      nama_program:data.nama_program||'SIDOJI Matahati',
+      keterangan:'Pengaturan program tersimpan di pengaturan_program.'
+    };
+  }else{
+    programConfig={aktif:false,tanggal_mulai:'',nama_program:'SIDOJI Matahati',keterangan:''};
+  }
+  renderProgramSettings();
+}
+async function saveProgramSettings(activateNow=false){
+  if(String(currentRole).toLowerCase()!=='admin'){toast('Pengaturan hanya dapat diubah oleh Admin.');return;}
+  const nama=($('settingNamaProgram').value||'SIDOJI Matahati').trim();
+  const tanggal=$('settingTanggalMulai').value;
+  const status=activateNow?'AKTIF':($('settingProgramAktif').checked?'AKTIF':'NONAKTIF');
+  if(!nama){toast('Nama program wajib diisi.');return;}
+  if(!tanggal){toast('Tanggal mulai program wajib diisi.');return;}
+
+  if(status==='AKTIF' && tanggal>today()){
+    toast('Program disiapkan. Karena tanggal mulai belum tiba, status tampilan menjadi MENUNGGU TANGGAL MULAI.');
+  }
+
+  const btn=activateNow?$('aktifkanProgramBtn'):$('simpanPengaturanBtn');
+  if(btn)btn.disabled=true;
+  try{
+    const {data:existing,error:e1}=await sb.from('pengaturan_program')
+      .select('id')
+      .order('tanggal_mulai',{ascending:false})
+      .limit(1)
+      .maybeSingle();
+    if(e1)throw e1;
+    if(!existing?.id)throw new Error('Data pengaturan_program belum tersedia. Jalankan SQL V35 terlebih dahulu.');
+
+    const {error}=await sb.from('pengaturan_program')
+      .update({
+        nama_program:nama,
+        status_program:status,
+        tanggal_mulai:tanggal,
+        updated_at:new Date().toISOString()
+      })
+      .eq('id',existing.id);
+    if(error)throw error;
+
+    programConfig={
+      aktif:status==='AKTIF',
+      tanggal_mulai:tanggal,
+      nama_program:nama,
+      keterangan:'Pengaturan program tersimpan di pengaturan_program.'
+    };
+    renderProgramSettings();
+    $('pengaturanMsg').textContent='Pengaturan program berhasil disimpan.';
+    toast('Pengaturan SIDOJI berhasil disimpan.');
+  }catch(e){
+    $('pengaturanMsg').textContent='Gagal menyimpan pengaturan: '+(e.message||e);
+    toast('Pengaturan gagal disimpan.');
+  }finally{if(btn)btn.disabled=false;}
+}
+function guardProgramForUser(){
+  if(!isNonAdmin())return true;
+  if(!programConfig.aktif){
+    openProgramWaiting('Program SIDOJI belum diaktifkan oleh Administrator.');
+    return false;
+  }
+  if(!programSudahDimulai()){
+    openProgramWaiting('Program SIDOJI sudah disiapkan tetapi tanggal mulai belum tiba: '+formatTanggalID(programConfig.tanggal_mulai)+'.');
+    return false;
+  }
+  return true;
+}
+function openProgramWaiting(message){
+  ['dashboardPage','tilawahPage','hutangPage','pengajianPage','rekapPage','laporanPage','akunPage','pengaturanPage'].forEach(id=>setHidden(id,true));
+  setHidden('placeholderPage',false);
+  $('pageTitle').textContent=programConfig.nama_program||'SIDOJI Matahati';
+  $('placeholderTitle').textContent='⏳ Program SIDOJI Belum Dimulai';
+  const p=$('placeholderPage').querySelector('p');
+  if(p)p.innerHTML=`${esc(message)}<br><br>Silakan hubungi Administrator SIDOJI.`;
+}
+function isGuru(){return String(currentRole||'').toLowerCase()==='guru'}
+function setHidden(id,hidden){const el=$(id);if(el)el.classList.toggle('hidden',hidden)}
+function isNonAdmin(){return !['admin'].includes(String(currentRole||'').toLowerCase())}
+function applyRoleUI(){
+  const limited=isNonAdmin();
+  document.querySelectorAll('.nav button[data-page="peserta"],.nav button[data-page="rekap"],.nav button[data-page="laporan"],.nav button[data-page="akun"],.nav button[data-page="pengaturan"]').forEach(b=>b.classList.toggle('hidden',limited));
+}
+function roleAllowed(){return ['admin','guru','pegawai','yayasan'].includes(String(currentRole||'').toLowerCase())}
+async function loadCurrentProfile(session){
+  currentUser=session?.user||null;
+  currentProfile=null;
+  currentRole=String(currentUser?.user_metadata?.role||'admin').toLowerCase();
+  currentPesertaId=currentUser?.user_metadata?.peserta_id||null;
+  if(!currentUser)return;
+  try{
+    const {data,error}=await sb.from('profiles').select('*').eq('id',currentUser.id).maybeSingle();
+    if(!error && data){
+      currentProfile=data;
+      currentRole=String(data.role||data.peran||currentRole).toLowerCase();
+      currentPesertaId=data.peserta_id||data.pesertaid||data.user_peserta_id||currentPesertaId||null;
+    }
+  }catch(e){console.warn('[SIDOJI PROFILE]',e)}
+  currentRole=['admin','guru','pegawai','yayasan'].includes(currentRole)?currentRole:'admin';
+  const nama=currentProfile?.nama_lengkap||currentProfile?.nama||currentUser.user_metadata?.nama_lengkap||currentUser.email||'Pengguna';
+  $('userInfo').textContent=`${nama} • ${currentRole.toUpperCase()}`;
+  applyRoleUI();
+}
+let selectedAkunPeserta=null;
+function rolePeserta(p){
+  const j=String(p?.jabatan||'').toLowerCase();
+  if(j.includes('yayasan')) return 'yayasan';
+  if(j.includes('guru')||j.includes('pengajar')||j.includes('ustadz')||j.includes('ustazah')) return 'guru';
+  return 'pegawai';
+}
+function setSelectedAkunPeserta(p){
+  selectedAkunPeserta=p||null;
+  const el=$('akunSelectedInfo');
+  if(!el)return;
+  if(!p){el.textContent='Belum memilih peserta';return;}
+  el.innerHTML=`<b>${esc(namaTanpaGelar(p.nama_lengkap||'-'))}</b><br><span class="mini">${esc(namaKeUsername(p.nama_lengkap||''))} • ${esc(rolePeserta(p).toUpperCase())} • ${esc(p.kode_peserta||'-')}</span>`;
+}
+async function invokeAccountFunction(payload){
+  const {data,error}=await sb.functions.invoke('create-parent-accounts',{body:payload});
+  if(error){
+    let detail='';
+    try{
+      if(error.context && typeof error.context.json==='function'){
+        const body=await error.context.json();
+        detail=body?.message||body?.error||body?.msg||'';
+      }
+    }catch(_){}
+    throw new Error(detail ? `${error.message||'Edge Function gagal'} — ${detail}` : (error.message||String(error)));
+  }
+  if(!data?.ok) throw new Error(data?.message||'Pembuatan akun gagal.');
+  return data;
+}
+async function buatAkunTerpilih(){
+  if(!selectedAkunPeserta){toast('Pilih satu peserta terlebih dahulu.');return;}
+  const password=$('akunPassword')?.value||'';
+  if(password.length<6){toast('Password minimal 6 karakter.');return;}
+  const btn=$('buatAkunTerpilihBtn'); btn.disabled=true; $('akunProgress').textContent='Memproses akun '+namaTanpaGelar(selectedAkunPeserta.nama_lengkap)+'...';
+  try{
+    const r=await invokeAccountFunction({action:'repair-account',peserta_id:selectedAkunPeserta.id,password,role:rolePeserta(selectedAkunPeserta)});
+    $('akunProgress').textContent=`Berhasil: ${r.nama_lengkap} • username: ${r.username} • role: ${String(r.role).toUpperCase()}`;
+    toast('Akun berhasil dibuat/diperbaiki.'); await loadAkunGuru();
+  }catch(e){console.error(e);$('akunProgress').textContent='Gagal: '+(e.message||String(e));toast('Gagal membuat akun: '+(e.message||e));}
+  finally{btn.disabled=false;}
+}
+async function buatSemuaAkun(){
+  const password=$('akunPassword')?.value||'';
+  if(password.length<6){toast('Password minimal 6 karakter.');return;}
+  if(!confirm('Buat/perbaiki akun untuk seluruh GURU aktif saja? Pegawai, sopir, dan yayasan tidak akan diproses.'))return;
+  const btn=$('buatSemuaAkunBtn');btn.disabled=true;const progress=$('akunProgress');
+  try{
+    const pr=await sb.rpc('get_peserta_sidoji'); if(pr.error)throw pr.error;
+    const peserta=(pr.data||[]).filter(p=>
+      String(p.status||'aktif').toLowerCase()!=='nonaktif' &&
+      rolePeserta(p)==='guru'
+    );
+    let ok=0,fail=0;const gagal=[];
+    for(let i=0;i<peserta.length;i++){
+      const p=peserta[i];progress.textContent=`Memproses guru ${i+1}/${peserta.length}: ${namaTanpaGelar(p.nama_lengkap)}...`;
+      try{
+        await invokeAccountFunction({action:'repair-account',peserta_id:p.id,password,role:'guru'});
+        ok++;
+      }catch(e){fail++;gagal.push(`${namaTanpaGelar(p.nama_lengkap)}: ${e.message||e}`);}
+    }
+    progress.textContent=`Selesai. Guru diproses: ${peserta.length}. Berhasil: ${ok}. Gagal: ${fail}.`+(gagal.length?'\n'+gagal.slice(0,10).join('\n'):'');
+    toast(`Akun guru selesai: ${ok} berhasil, ${fail} gagal.`);await loadAkunGuru();
+  }catch(e){progress.textContent='Gagal memuat data guru: '+(e.message||e);toast('Proses gagal.');}
+  finally{btn.disabled=false;}
+}
+async function sinkronkanAkunLama(){
+  if(!confirm('Sinkronkan username, role, dan nama akun yang sudah ada? Password tidak diubah.'))return;
+  const btn=$('bersihkanAkunBtn');btn.disabled=true;$('akunProgress').textContent='Menyinkronkan akun lama...';
+  try{const r=await invokeAccountFunction({action:'normalize-existing'});$('akunProgress').textContent=`Sinkronisasi selesai. Diperbaiki: ${r.fixed||0}, tetap: ${r.unchanged||0}, gagal: ${r.failed||0}.`;toast('Sinkronisasi selesai.');await loadAkunGuru();}
+  catch(e){$('akunProgress').textContent='Gagal: '+(e.message||e);toast('Sinkronisasi gagal: '+(e.message||e));}
+  finally{btn.disabled=false;}
+}
+
+async function loadAkunGuru(){
+  const body=$('akunGuruBody'); if(!body)return;
+  body.innerHTML='<tr><td colspan="8" class="empty">Memuat data 104 guru...</td></tr>';
+  try{
+    const pr=await sb.rpc('get_peserta_sidoji');
+    if(pr.error)throw pr.error;
+    const peserta=pr.data||[];
+    const active=peserta.filter(p=>String(p.status||'aktif').toLowerCase()!=='nonaktif');
+    const gurus=active.filter(p=>rolePeserta(p)==='guru');
+    const prf=await sb.from('profiles').select('*');
+    const profiles=prf.error?[]:(prf.data||[]);
+    const profileMap=new Map(profiles.map(x=>[String(x.peserta_id||x.pesertaid||x.user_peserta_id||''),x]));
+    const q=($('akunGuruSearch')?.value||'').toLowerCase().trim();
+    const filtered=gurus.filter(p=>`${namaTanpaGelar(p.nama_lengkap||'')} ${p.nama_lengkap||''} ${p.kode_peserta||''} ${p.nama_lembaga||''} ${p.jabatan||''}`.toLowerCase().includes(q));
+    body.innerHTML=filtered.length?filtered.map((p,i)=>{
+      const username=namaKeUsername(p.nama_lengkap||'');
+      const pr=profileMap.get(String(p.id));
+      const role=String(pr?.role||rolePeserta(p)).toUpperCase();
+      return `<tr class="akun-row ${selectedAkunPeserta&&String(selectedAkunPeserta.id)===String(p.id)?'akun-selected-row':''}" data-peserta-id="${esc(p.id)}"><td>${i+1}</td><td><b>${esc(namaTanpaGelar(p.nama_lengkap||'-'))}</b></td><td><code>${esc(username||'-')}</code></td><td>${esc(p.kode_peserta||'-')}</td><td>${esc(p.nama_lembaga||'-')}</td><td>${esc(p.jabatan||'-')}</td><td><span class="status-badge status-hadir">${esc(role)}</span></td><td>${pr?'<span class="status-badge status-lunas">AKUN SUDAH ADA</span>':'<span class="status-badge status-alpa">BELUM ADA AKUN</span>'}</td></tr>`;
+    }).join(''):'<tr><td colspan="8" class="empty">Tidak ada peserta yang cocok.</td></tr>';
+    body.querySelectorAll('tr.akun-row').forEach(tr=>tr.addEventListener('click',()=>{const p=gurus.find(x=>String(x.id)===String(tr.dataset.pesertaId));setSelectedAkunPeserta(p);body.querySelectorAll('tr.akun-row').forEach(x=>x.classList.remove('akun-selected-row'));tr.classList.add('akun-selected-row');}));
+    const akunGuruCount=gurus.filter(p=>profileMap.has(String(p.id))).length;
+    $('akunGuruInfo').textContent=`${filtered.length} guru • ${akunGuruCount} akun guru sudah dibuat dari ${gurus.length} guru aktif`;
+  }catch(e){
+    body.innerHTML=`<tr><td colspan="8" class="empty">Gagal memuat peserta: ${esc(e.message||e)}</td></tr>`;
+    $('akunGuruInfo').textContent='Gagal memuat';
+  }
+}
+function namaTanpaGelar(nama){
+  let s=String(nama||'').trim();
+  const titles=/\b(?:prof|dr|drs|dra|ir|hj|h|ust|ustadz|ustazah|gr|lc|a\.?md(?:\.kom)?|amd(?:\.kom)?|s\.?pd(?:\.i)?|m\.?pd(?:\.i)?|s\.?ag|m\.?ag|s\.?e|m\.?e|s\.?m|m\.?m|s\.?kom|m\.?kom|s\.?si|m\.?si|s\.?h|m\.?h|s\.?t|m\.?t|s\.?p|m\.?p|s\.?psi|m\.?psi|s\.?sos|m\.?sos|s\.?ip|m\.?ip)\.?\b/gi;
+  s=s.replace(/,.*$/,'');
+  s=s.replace(titles,' ');
+  s=s.replace(/\s+/g,' ').trim();
+  return s;
+}
+function namaKeUsername(nama){
+  return namaTanpaGelar(nama).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'.').replace(/^\.|\.$/g,'');
+}
+
+async function loadDashboard(){const {data,error}=await sb.rpc('get_dashboard_sidoji_v2',{p_tanggal:today()});if(error){toast('Dashboard gagal dimuat: '+error.message);return}const r=data?.[0]||data||{};$('totalPeserta').textContent=Number(r.total_peserta||0).toLocaleString('id-ID');$('totalHutang').textContent=Number(r.total_hutang_juz||0).toLocaleString('id-ID')+' Juz';$('adaHutang').textContent=Number(r.peserta_ada_hutang||0).toLocaleString('id-ID');$('lunas').textContent=Number(r.peserta_lunas||0).toLocaleString('id-ID');const now=new Date(),bulan=now.getMonth()+1,tahun=now.getFullYear();const rr=await sb.rpc('get_rekap_lembaga_sidoji',{p_bulan:bulan,p_tahun:tahun});if(rr.error){toast('Rekap gagal dimuat: '+rr.error.message);return}const rows=rr.data||[];$('rekapBody').innerHTML=rows.length?rows.map(x=>`<tr><td><b>${esc(x.nama_lembaga||'-')}</b></td><td>${Number(x.jumlah_peserta||0)}</td><td>${Number(x.hari_wajib||0)}</td><td>${Number(x.hari_tilawah||0)}</td><td>${Number(x.total_juz||0)}</td><td>${Number(x.persentase_tilawah||0).toFixed(2)}%</td><td><b>${Number(x.total_hutang_juz||0).toLocaleString('id-ID')} Juz</b></td></tr>`).join(''):'<tr><td colspan="7" class="empty">Belum ada data lembaga.</td></tr>'}
+let pesertaCache=[];let selectedJuz=new Set();
+let tilawahLimit={batas_hari_ini:0,sudah_dibaca_hari_ini:0,sisa_batas:0,juz_tersimpan:[]};
+function renderJuz(){
+  let html='';
+  for(let i=1;i<=30;i++){
+    const already=(tilawahLimit.juz_tersimpan||[]).includes(i);
+    const atLimit=!already && selectedJuz.size>=Number(tilawahLimit.sisa_batas||0);
+    html+=`<button type="button" class="juz ${selectedJuz.has(i)?'selected':''}" data-juz="${i}" ${already?'disabled':''} ${atLimit?'disabled':''}>${i}</button>`;
+  }
+  $('juzGrid').innerHTML=html;
+  document.querySelectorAll('.juz').forEach(b=>b.onclick=()=>{
+    const j=Number(b.dataset.juz);
+    if(b.disabled)return;
+    if(selectedJuz.has(j)) selectedJuz.delete(j);
+    else {
+      if(selectedJuz.size>=Number(tilawahLimit.sisa_batas||0)){
+        toast('Batas Juz hari ini sudah tercapai.');
+        return;
+      }
+      selectedJuz.add(j);
+    }
+    renderJuz();
+    updateSummary();
+  });
+}
+function updateSummary(){const p=selectedPersonObj();$('summaryPerson').textContent=p?`${p.kode_peserta} — ${p.nama_lengkap}`:'Belum dipilih';$('summaryDate').textContent=$('tilawahTanggal').value||'-';$('summaryJuz').textContent=selectedJuz.size;const max=Number(tilawahLimit.batas_hari_ini||0),used=Number(tilawahLimit.sudah_dibaca_hari_ini||0),left=Number(tilawahLimit.sisa_batas||0);$('summaryLimit').textContent=`Batas hari ini: ${max} Juz • Sudah tersimpan: ${used} • Sisa boleh: ${left}`;}
+async function loadTilawahLimit(){const id=$('selectedPesertaId').value,tgl=$('tilawahTanggal').value;if(!id||!tgl){tilawahLimit={batas_hari_ini:0,sudah_dibaca_hari_ini:0,sisa_batas:0,juz_tersimpan:[]};renderJuz();updateSummary();return}const {data,error}=await sb.rpc('get_batas_tilawah_sidoji',{p_peserta_id:id,p_tanggal:tgl});if(error){toast('Batas Tilawah gagal dimuat: '+error.message);return}tilawahLimit=data?.[0]||data||{batas_hari_ini:0,sudah_dibaca_hari_ini:0,sisa_batas:0,juz_tersimpan:[]};selectedJuz=new Set([...selectedJuz].filter(j=>!(tilawahLimit.juz_tersimpan||[]).includes(j)).slice(0,Number(tilawahLimit.sisa_batas||0)));renderJuz();updateSummary()}
+function selectedPersonObj(){const id=$('selectedPesertaId').value;return pesertaCache.find(p=>p.id===id)||window._selectedPerson||null}
+async function loadPeserta(){const {data,error}=await sb.rpc('get_peserta_sidoji');if(error){toast('Peserta gagal dimuat: '+error.message);return}pesertaCache=data||[]}
+function showPeople(q){q=(q||'').trim().toLowerCase();if(!q){$('personResults').classList.add('hidden');return}const rows=pesertaCache.filter(p=>`${p.kode_peserta} ${p.nama_lengkap} ${p.jabatan||''}`.toLowerCase().includes(q)).slice(0,20);$('personResults').innerHTML=rows.length?rows.map(p=>`<div class="person-option" data-id="${p.id}"><b>${esc(p.nama_lengkap)}</b><small>${esc(p.kode_peserta)} • ${esc(p.jabatan||'-')} • ${esc(p.nama_lembaga||'-')}</small></div>`).join(''):'<div class="empty">Peserta tidak ditemukan.</div>';$('personResults').classList.remove('hidden');document.querySelectorAll('.person-option').forEach(el=>el.onclick=()=>selectPerson(el.dataset.id))}
+async function selectPerson(id){const p=pesertaCache.find(x=>x.id===id);if(!p)return;window._selectedPerson=p;$('selectedPesertaId').value=p.id;$('pesertaSearch').value=p.nama_lengkap;$('selectedPerson').innerHTML=`<b>${esc(p.nama_lengkap)}</b><br><span>${esc(p.kode_peserta)} • ${esc(p.jabatan||'-')} • ${esc(p.nama_lembaga||'-')}</span>`;$('selectedPerson').classList.remove('hidden');$('personResults').classList.add('hidden');await loadTilawahLimit();}
+async function loadTilawah(){const {data,error}=await sb.rpc('get_tilawah_sidoji',{p_limit:100});if(error){$('tilawahBody').innerHTML=`<tr><td colspan="7" class="empty">Gagal memuat: ${esc(error.message)}</td></tr>`;return}renderTilawah(data||[])}
+function renderTilawah(rows){const q=($('tilawahListSearch').value||'').toLowerCase().trim();const r=rows.filter(x=>!q||`${x.kode_peserta} ${x.nama_lengkap}`.toLowerCase().includes(q));$('tilawahBody').innerHTML=r.length?r.map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.kode_peserta)}</td><td><b>${esc(x.nama_lengkap)}</b></td><td>${esc(x.nama_lembaga||'-')}</td><td><span class="pill">Juz ${Number(x.juz)}</span></td><td>${esc(x.status||'-')}</td><td>${esc(x.keterangan||'-')}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">Belum ada data tilawah.</td></tr>'}
+async function saveTilawah(){if(!guardProgramForUser())return;const pesertaId=isGuru()?currentPesertaId:$('selectedPesertaId').value,tanggal=$('tilawahTanggal').value,keterangan=$('tilawahKeterangan').value.trim();if(!pesertaId){toast('Pilih peserta terlebih dahulu.');return}if(!tanggal){toast('Tanggal belum diisi.');return}if(programConfig.tanggal_mulai&&tanggal<programConfig.tanggal_mulai){toast('Tanggal Tilawah tidak boleh sebelum tanggal mulai program SIDOJI.');return}if(!selectedJuz.size){toast('Pilih minimal 1 Juz.');return}if(selectedJuz.size>Number(tilawahLimit.sisa_batas||0)){toast(`Melebihi batas. Sisa yang boleh dibaca hari ini ${Number(tilawahLimit.sisa_batas||0)} Juz.`);return}const btn=$('saveTilawahBtn');btn.disabled=true;btn.textContent='Menyimpan...';try{const juzs=[...selectedJuz].sort((a,b)=>a-b);const {data,error}=await sb.rpc('simpan_tilawah_batch_sidoji',{p_peserta_id:pesertaId,p_tanggal:tanggal,p_juz:juzs,p_status:'Selesai',p_keterangan:keterangan||null});if(error)throw error;toast(`${juzs.length} Juz berhasil disimpan.`);await clearTilawah();if(isNonAdmin()){await loadGuruTilawah()}else{await loadTilawah()}}catch(e){toast('Gagal menyimpan: '+(e.message||e))}finally{btn.disabled=false;btn.textContent='Simpan Tilawah'}}
+async function clearTilawah(){
+  tilawahLimit={batas_hari_ini:0,sudah_dibaca_hari_ini:0,sisa_batas:0,juz_tersimpan:[]};
+  $('tilawahTanggal').value=today();$('tilawahKeterangan').value='';selectedJuz=new Set();
+  if(isNonAdmin() && currentPesertaId){
+    await lockGuruTilawahToSelf();
+  }else{
+    $('selectedPesertaId').value='';window._selectedPerson=null;$('pesertaSearch').value='';$('selectedPerson').classList.add('hidden');$('tilawahPage').classList.remove('guru-self-locked');
+  }
+  renderJuz();updateSummary();
+}
+
+async function openDashboard(){
+  ['tilawahPage','pesertaPage','placeholderPage','hutangPage','rekapPage','laporanPage','akunPage','pengajianPage','pengaturanPage'].forEach(id=>setHidden(id,true));
+  setHidden('dashboardPage',false);
+  $('pageTitle').textContent='Dashboard';
+  const nama=currentProfile?.nama_lengkap||currentProfile?.nama||currentUser?.user_metadata?.nama_lengkap||currentUser?.email||'Pengguna';
+  $('dashGreeting').textContent=`Assalamu'alaikum, ${nama} 👋`;
+  $('dashProgramName').textContent=programConfig.nama_program||'SIDOJI Matahati';
+  $('dashStartDate').textContent=programConfig.tanggal_mulai?formatTanggalID(programConfig.tanggal_mulai):'Belum ditentukan';
+  const active=!!programConfig.aktif;
+  $('dashProgramStatus').textContent=active?'PROGRAM AKTIF':'PROGRAM NONAKTIF';
+  $('dashProgramStatus').style.background=active?'#e5f8ef':'#fff2f2';
+  $('dashProgramStatus').style.color=active?'#087443':'#c24141';
+  $('dashStatusText').textContent=active?'AKTIF':'NONAKTIF';
+  $('adminDashStats').classList.toggle('hidden',isNonAdmin());
+  $('guruDashStats').classList.toggle('hidden',!isNonAdmin());
+  $('adminQuickActions').classList.toggle('hidden',isNonAdmin());
+  if(isNonAdmin()){
+    await loadGuruDashboardCards();
+  }else{
+    await loadAdminDashboardCards();
+  }
+}
+async function loadAdminDashboardCards(){
+  await loadPeserta();
+  $('dashTotalPeserta').textContent=pesertaCache.length.toLocaleString('id-ID');
+  let rows=[];
+  try{
+    const {data}=await sb.rpc('get_rekap_sidoji_v1',{p_periode:'harian',p_tanggal:today(),p_bulan:Number(today().slice(5,7)),p_tahun:Number(today().slice(0,4))});
+    rows=data||[];
+  }catch(e){}
+  const selesai=rows.filter(x=>Number(x.hari_tilawah||0)>0).length;
+  const hutang=rows.reduce((s,x)=>s+Number(x.saldo_hutang||0),0);
+  $('dashTilawahHari').textContent=selesai.toLocaleString('id-ID');
+  $('dashHutang').textContent=hutang.toLocaleString('id-ID');
+  $('dashPengajian').textContent='—';
+  const pct=rows.length?Math.round(selesai/rows.length*100):0;
+  setDashProgress(pct,rows.length?`${selesai} dari ${rows.length} peserta`:'Program belum aktif.',rows.length?`Progress Tilawah hari ini ${pct}%`:'Belum ada kewajiban.');
+}
+async function loadGuruDashboardCards(){
+  if(!currentPesertaId)return;
+  let tilawah=0,total=0,hutang=0,presensi=0;
+  try{
+    const {data}=await sb.rpc('get_tilawah_sidoji',{p_limit:1000});
+    const mine=(data||[]).filter(x=>String(x.peserta_id)===String(currentPesertaId));
+    const t=today(); tilawah=mine.filter(x=>String(x.tanggal).slice(0,10)===t).length; total=mine.length;
+  }catch(e){}
+  try{
+    const {data}=await sb.rpc('get_hutang_sidoji',{p_tanggal:today()});
+    hutang=Number(((data||[]).find(x=>String(x.peserta_id)===String(currentPesertaId))||{}).hutang_juz||0);
+  }catch(e){}
+  $('guruDashTilawah').textContent=`${tilawah} / 1`;
+  $('guruDashHutang').textContent=hutang;
+  $('guruDashTotalJuz').textContent=total;
+  $('guruDashPengajian').textContent=presensi;
+  const pct=Math.min(100,tilawah*100);
+  setDashProgress(pct,tilawah?'Target hari ini sudah tercapai':'Target hari ini belum selesai',tilawah?'Alhamdulillah, Tilawah hari ini sudah tercatat.':'Satu hari satu Juz. Langkah kecil untuk hidup yang lebih baik.');
+}
+function setDashProgress(pct,label,text){
+  const deg=Math.round(Math.max(0,Math.min(100,pct))*3.6);
+  $('dashProgressRing').style.background=`conic-gradient(var(--sid-green2) ${deg}deg,#e7eef0 ${deg}deg)`;
+  $('dashProgressPct').textContent=`${Math.round(pct)}%`;
+  $('dashProgressLabel').textContent=label;
+  $('dashProgressText').textContent=text;
+}
+async function openPesertaPage(){
+  if(isNonAdmin()){toast('Menu Peserta hanya untuk Admin.');return}
+  ['dashboardPage','tilawahPage','placeholderPage','hutangPage','rekapPage','laporanPage','akunPage','pengajianPage','pengaturanPage'].forEach(id=>setHidden(id,true));
+  setHidden('pesertaPage',false);
+  $('pageTitle').textContent='Peserta';
+  await loadPesertaPage();
+}
+async function loadPesertaPage(){
+  await loadPeserta();
+  renderPesertaPage();
+}
+function renderPesertaPage(){
+  const q=($('pesertaPageSearch').value||'').trim().toLowerCase();
+  const rows=pesertaCache.filter(p=>`${p.kode_peserta||''} ${p.nama_lengkap||''} ${p.jabatan||''} ${p.nama_lembaga||''}`.toLowerCase().includes(q));
+  $('pesertaCount').textContent=rows.length.toLocaleString('id-ID');
+  $('pesertaPageBody').innerHTML=rows.length?rows.map((p,i)=>`<tr><td>${i+1}</td><td><b>${esc(p.kode_peserta||'-')}</b></td><td><b>${esc(p.nama_lengkap||'-')}</b></td><td>${esc(p.nama_lembaga||'-')}</td><td>${esc(p.jabatan||'-')}</td><td><span class="status-badge status-hadir">${esc(p.status||'Aktif')}</span></td></tr>`).join(''):'<tr><td colspan="6" class="empty">Peserta tidak ditemukan.</td></tr>';
+}
+async function openTilawah(){
+  ['dashboardPage','placeholderPage','hutangPage','rekapPage','laporanPage','akunPage','pengajianPage'].forEach(id=>setHidden(id,true));
+  setHidden('tilawahPage',false);
+  $('pageTitle').textContent=isNonAdmin()?'Tilawah Saya':'Tilawah';
+  if(!pesertaCache.length)await loadPeserta();
+  if(isNonAdmin() && currentPesertaId){
+    await lockGuruTilawahToSelf();
+    await loadGuruTilawah();
+  } else {
+    $('tilawahPage').classList.remove('guru-self-locked');
+    await loadTilawah();
+  }
+}
+async function enterApp(session){
+  $('loginPage').classList.add('hidden');$('appPage').classList.remove('hidden');
+  await loadCurrentProfile(session);
+  await loadProgramSettings();
+  if(isNonAdmin() && !guardProgramForUser()) return;
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  const d=document.querySelector('.nav button[data-page="dashboard"]'); if(d)d.classList.add('active');
+  await openDashboard();
+}
+async function lockGuruTilawahToSelf(){
+  if(!isNonAdmin() || !currentPesertaId) return false;
+  if(!pesertaCache.length) await loadPeserta();
+  const p=pesertaCache.find(x=>String(x.id)===String(currentPesertaId));
+  if(!p){
+    toast('Akun guru belum terhubung ke data peserta. Hubungi admin.');
+    return false;
+  }
+  window._selectedPerson=p;
+  $('selectedPesertaId').value=p.id;
+  $('pesertaSearch').value=p.nama_lengkap||'';
+  $('selectedPerson').innerHTML=`<b>${esc(p.nama_lengkap||'-')}</b><br><span>${esc(p.kode_peserta||'-')} • ${esc(p.jabatan||'-')} • ${esc(p.nama_lembaga||'-')}</span>`;
+  $('selectedPerson').classList.remove('hidden');
+  $('tilawahPage').classList.add('guru-self-locked');
+  await loadTilawahLimit();
+  return true;
+}
+
+async function openGuruDashboard(){
+  ['dashboardPage','hutangPage','pengajianPage','rekapPage','laporanPage','akunPage','placeholderPage'].forEach(id=>setHidden(id,true));
+  setHidden('tilawahPage',false);
+  $('pageTitle').textContent='Tilawah Saya';
+  if(currentPesertaId){
+    const ok=await lockGuruTilawahToSelf();
+    if(ok) await loadGuruTilawah();
+  }else{
+    $('tilawahBody').innerHTML='<tr><td colspan="7" class="empty">Akun guru belum terhubung ke data peserta. Hubungi admin.</td></tr>';
+  }
+}
+async function loadGuruTilawah(){
+  const {data,error}=await sb.rpc('get_tilawah_sidoji',{p_limit:1000});
+  if(error){$('tilawahBody').innerHTML=`<tr><td colspan="7" class="empty">Gagal memuat: ${esc(error.message)}</td></tr>`;return}
+  renderTilawah((data||[]).filter(x=>String(x.peserta_id)===String(currentPesertaId)));
+}
+
+
+let hutangRows=[];
+let currentHutangDetail=null;
+
+async function loadHutang(){
+  const {data,error}=await sb.rpc('get_hutang_sidoji',{p_tanggal:today()});
+  if(error){ $('hutangBody').innerHTML=`<tr><td colspan="6" class="empty">Gagal memuat: ${esc(error.message)}</td></tr>`; return; }
+  hutangRows=isNonAdmin() && currentPesertaId
+    ? (data||[]).filter(x=>String(x.peserta_id)===String(currentPesertaId))
+    : (data||[]);
+  renderHutang();
+}
+
+function renderHutang(){
+  const q=($('hutangSearch').value||'').toLowerCase().trim();
+  const rows=hutangRows.filter(x=>!q||`${x.kode_peserta} ${x.nama_lengkap} ${x.nama_lembaga||''}`.toLowerCase().includes(q));
+  $('hutangBody').innerHTML=rows.length?rows.map((x,i)=>{
+    const h=Number(x.hutang_juz||0);
+    return `<tr>
+      <td>${i+1}</td><td>${esc(x.kode_peserta||'-')}</td>
+      <td><b>${esc(x.nama_lengkap)}</b><br><span class="mini">${esc(x.jabatan||'-')}</span></td>
+      <td>${esc(x.nama_lembaga||'-')}</td>
+      <td><b>${h} Juz</b></td>
+      <td>${h>0?`<button class="btn-primary" onclick="openBayarHutang('${x.peserta_id}')">💳 Bayar</button>`:'<span class="pill">Lunas</span>'}</td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="6" class="empty">Tidak ada peserta dengan kriteria tersebut.</td></tr>';
+}
+
+async function openBayarHutang(id){
+  if(isNonAdmin() && String(id)!==String(currentPesertaId)){toast('Akses hutang peserta lain ditolak.');return;}
+  const {data,error}=await sb.rpc('get_hutang_detail_sidoji',{p_peserta_id:id,p_tanggal:today()});
+  if(error){toast('Detail hutang gagal dimuat: '+error.message);return;}
+  const d=data?.[0]||data;
+  if(!d){toast('Data hutang tidak ditemukan.');return;}
+  currentHutangDetail=d;
+  const paid=new Set((d.juz_dibayar||[]).map(Number));
+  const hutang=Number(d.hutang_juz||0);
+  if(hutang<=0){toast('Peserta ini sudah tidak memiliki hutang.');return;}
+
+  // Always render all 30 Juz. Paid ones are locked.
+  let grid='';
+  for(let j=1;j<=30;j++){
+    const isPaid=paid.has(j);
+    grid+=`<label class="bayar-juz ${isPaid?'paid locked':'available'}">
+      <input type="checkbox" class="bayar-juz-check" value="${j}" ${isPaid?'checked disabled':''}>
+      Juz ${j}${isPaid?' ✓':''}
+    </label>`;
+  }
+
+  $('bayarHutangPanel').innerHTML=`
+    <div class="form-card">
+      <div class="section-head"><div><h3>💳 Bayar Hutang Tilawah</h3>
+        <div class="mini">${esc(d.nama_lengkap)} • ${esc(d.kode_peserta||'')}</div></div>
+        <button class="btn-light" onclick="closeBayarHutang()">Tutup</button>
+      </div>
+      <div class="hutang-summary">
+        <div class="hutang-box"><div class="label">Hutang Saat Ini</div><div class="n">${hutang} Juz</div></div>
+        <div class="hutang-box"><div class="label">Sudah Dibayar</div><div class="n">${paid.size} Juz</div></div>
+        <div class="hutang-box"><div class="label">Pilihan Baru</div><div class="n" id="jumlahPilihanHutang">0 Juz</div></div>
+      </div>
+      <label>Pilih Juz 1–30</label>
+      <div class="mini">Juz yang sudah dibayar terkunci. Juz baru harus dipilih berurutan mulai dari Juz berikutnya.</div>
+      <div class="bayar-juz-grid">${grid}</div>
+      <label>Keterangan</label>
+      <input id="keteranganBayarHutang" placeholder="Opsional">
+      <div class="bayar-actions">
+        <button class="btn-light" onclick="closeBayarHutang()">Batal</button>
+        <button class="btn-primary" id="simpanBayarHutangBtn" onclick="saveBayarHutang()">💾 Simpan Pembayaran</button>
+      </div>
+      <div id="bayarHutangMsg" class="hint" style="margin-top:10px"></div>
+    </div>`;
+  $('bayarHutangPanel').classList.remove('hidden');
+  bindSequentialHutangCheckboxes(paid,hutang);
+  $('bayarHutangPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function bindSequentialHutangCheckboxes(paid,hutang){
+  const checks=[...document.querySelectorAll('.bayar-juz-check')];
+  const paidCount=paid.size;
+  const maxNew=Math.max(0,hutang);
+  checks.forEach(cb=>{
+    if(cb.disabled)return;
+    cb.addEventListener('change',()=>{
+      const selected=checks.filter(x=>x.checked&&!x.disabled).map(x=>Number(x.value)).sort((a,b)=>a-b);
+      const expectedStart=paidCount+1;
+      const valid=selected.every((v,i)=>v===expectedStart+i);
+      if(selected.length>maxNew || (selected.length && !valid)){
+        cb.checked=false;
+        toast('Juz harus dipilih berurutan mulai dari Juz '+expectedStart+'.');
+        return;
+      }
+      $('jumlahPilihanHutang').textContent=selected.length+' Juz';
+    });
+  });
+}
+
+function closeBayarHutang(){
+  $('bayarHutangPanel').classList.add('hidden');
+  $('bayarHutangPanel').innerHTML='';
+  currentHutangDetail=null;
+}
+
+async function saveBayarHutang(){
+  if(!currentHutangDetail)return;
+  const checks=[...document.querySelectorAll('.bayar-juz-check')];
+  const juzs=checks.filter(x=>x.checked&&!x.disabled).map(x=>Number(x.value)).sort((a,b)=>a-b);
+  const hutang=Number(currentHutangDetail.hutang_juz||0);
+  const paid=new Set((currentHutangDetail.juz_dibayar||[]).map(Number));
+  const start=paid.size+1;
+  const valid=juzs.every((v,i)=>v===start+i);
+  const msg=$('bayarHutangMsg');
+  if(!juzs.length){msg.textContent='Pilih minimal 1 Juz.';return;}
+  if(juzs.length>hutang){msg.textContent='Jumlah pilihan melebihi hutang saat ini.';return;}
+  if(!valid){msg.textContent='Juz harus berurutan mulai Juz '+start+'.';return;}
+
+  const btn=$('simpanBayarHutangBtn');btn.disabled=true;btn.textContent='Menyimpan...';
+  const {data,error}=await sb.rpc('bayar_hutang_sidoji_v2',{
+    p_peserta_id:currentHutangDetail.peserta_id,
+    p_juz:juzs,
+    p_tanggal_bayar:today(),
+    p_keterangan:$('keteranganBayarHutang').value.trim()||null
+  });
+  if(error){msg.textContent='Gagal: '+error.message;btn.disabled=false;btn.textContent='💾 Simpan Pembayaran';return;}
+  toast(juzs.length+' Juz berhasil dibayar.');
+  closeBayarHutang();
+  await loadHutang();
+}
+
+async function openHutang(){
+  ['dashboardPage','tilawahPage','placeholderPage','rekapPage','laporanPage','akunPage','pengajianPage'].forEach(id=>setHidden(id,true));
+  setHidden('hutangPage',false);
+  $('pageTitle').textContent='Hutang';
+  await loadHutang();
+}
+
+
+function initRekapInputs(){
+  const d=new Date(), y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0');
+  $('rekapTanggal').value=today();
+  $('rekapBulan').value=`${y}-${m}`;
+  $('rekapTahun').value=y;
+  toggleRekapInputs();
+}
+function toggleRekapInputs(){
+  const p=$('rekapPeriode').value;
+  $('rekapTanggal').disabled=p!=='harian';
+  $('rekapBulan').disabled=p!=='bulanan';
+  $('rekapTahun').disabled=p!=='tahunan';
+}
+async function loadRekap(){
+  const periode=$('rekapPeriode').value;
+  let params={p_periode:periode,p_tanggal:$('rekapTanggal').value||today(),p_bulan:($('rekapBulan').value||'').slice(5,7)||String(new Date().getMonth()+1),p_tahun:Number($('rekapTahun').value||new Date().getFullYear())};
+  const {data,error}=await sb.rpc('get_rekap_sidoji_v1',params);
+  if(error){
+    toast('Rekap gagal dimuat: '+error.message);
+    return;
+  }
+  const rows=data||[];
+  $('rekapTotalPeserta').textContent=rows.length.toLocaleString('id-ID');
+  $('rekapTotalJuz').textContent=rows.reduce((s,x)=>s+Number(x.total_juz||0),0).toLocaleString('id-ID')+' Juz';
+  $('rekapHutangPeriode').textContent=rows.reduce((s,x)=>s+Number(x.hutang_periode||0),0).toLocaleString('id-ID')+' Juz';
+  $('rekapTotalHutang').textContent=rows.reduce((s,x)=>s+Number(x.saldo_hutang||0),0).toLocaleString('id-ID')+' Juz';
+  $('rekapPesertaBody').innerHTML=rows.length?rows.map((x,i)=>`<tr>
+    <td>${i+1}</td><td>${esc(x.kode_peserta||'-')}</td><td><b>${esc(x.nama_lengkap||'-')}</b></td>
+    <td>${esc(x.nama_lembaga||'-')}</td><td>${Number(x.hari_wajib||0)}</td>
+    <td>${Number(x.hari_tilawah||0)}</td><td>${Number(x.total_juz||0)}</td>
+    <td><b>${Number(x.hutang_periode||0)}</b></td>
+    <td><b>${Number(x.saldo_hutang||0)}</b></td>
+    <td>${Number(x.persentase_tilawah||0).toFixed(2)}%</td>
+  </tr>`).join(''):'<tr><td colspan="10" class="empty">Tidak ada data pada periode ini.</td></tr>';
+
+  const detail=await sb.rpc('get_rekap_detail_sidoji_v1',params);
+  if(detail.error){
+    $('rekapDetailBody').innerHTML=`<tr><td colspan="7" class="empty">Detail gagal dimuat: ${esc(detail.error.message)}</td></tr>`;
+  }else{
+    const dr=detail.data||[];
+    $('rekapDetailBody').innerHTML=dr.length?dr.map(x=>`<tr>
+      <td>${esc(x.tanggal)}</td><td>${esc(x.kode_peserta||'-')}</td><td><b>${esc(x.nama_lengkap||'-')}</b></td>
+      <td>${esc(x.nama_lembaga||'-')}</td><td><span class="pill">Juz ${Number(x.juz)}</span></td>
+      <td>${esc(x.status||'-')}</td><td>${esc(x.keterangan||'-')}</td>
+    </tr>`).join(''):'<tr><td colspan="7" class="empty">Tidak ada detail tilawah.</td></tr>';
+  }
+}
+let pengajianPesertaCache=[];
+async function loadPengajianPeserta(){
+  const {data,error}=await sb.from('peserta').select('id,kode_peserta,nama_lengkap,jabatan,lembaga_id,status').eq('status','Aktif').order('nama_lengkap');
+  if(error){toast('Peserta pengajian gagal dimuat: '+error.message);return;}
+  pengajianPesertaCache=data||[];
+}
+function showPengajianPeople(q){
+  q=(q||'').trim().toLowerCase();
+  const box=$('pengajianResults');
+  if(!q){box.classList.add('hidden');box.innerHTML='';return;}
+  const rows=pengajianPesertaCache.filter(x=>(x.nama_lengkap||'').toLowerCase().includes(q)||(x.kode_peserta||'').toLowerCase().includes(q)).slice(0,12);
+  box.innerHTML=rows.length?rows.map(x=>`<div class="search-item" onclick="selectPengajianPerson('${x.id}')"><b>${esc(x.nama_lengkap)}</b><small>${esc(x.kode_peserta||'-')} · ${esc(x.jabatan||'-')}</small></div>`).join(''):'<div class="search-item">Peserta tidak ditemukan.</div>';
+  box.classList.remove('hidden');
+}
+function selectPengajianPerson(id){
+  const x=pengajianPesertaCache.find(v=>v.id===id); if(!x)return;
+  $('pengajianPesertaId').value=x.id;$('pengajianSearch').value=x.nama_lengkap;$('pengajianSelected').textContent=(x.kode_peserta||'-')+' · '+(x.jabatan||'-');$('pengajianSelected').classList.remove('hidden');$('pengajianResults').classList.add('hidden');updatePengajianSummary();
+}
+function updatePengajianSummary(){
+  $('pengajianSummaryPerson').textContent=$('pengajianSearch').value||'Belum dipilih';
+  $('pengajianSummaryDate').textContent=$('pengajianTanggal').value||'-';
+  $('pengajianSummaryJenis').textContent=$('pengajianJenis').value;
+  const st=document.querySelector('input[name="pengajianStatus"]:checked');$('pengajianSummaryStatus').textContent=st?st.value:'-';
+}
+function clearPengajian(){
+  $('pengajianPesertaId').value='';$('pengajianSearch').value='';$('pengajianSelected').textContent='';$('pengajianSelected').classList.add('hidden');$('pengajianTanggal').value=today();$('pengajianJenis').value='Mingguan';document.querySelector('input[name="pengajianStatus"][value="Hadir"]').checked=true;$('pengajianKeterangan').value='';$('pengajianMsg').textContent='';updatePengajianSummary();
+}
+async function savePengajian(){if(!guardProgramForUser())return;
+  const pesertaId=$('pengajianPesertaId').value,tanggal=$('pengajianTanggal').value,jenis=$('pengajianJenis').value;const st=document.querySelector('input[name="pengajianStatus"]:checked');const status=st?st.value:'Hadir';const ket=$('pengajianKeterangan').value.trim()||null;const msg=$('pengajianMsg');
+  if(!pesertaId){msg.textContent='Pilih peserta terlebih dahulu.';return;} if(!tanggal){msg.textContent='Tanggal wajib diisi.';return;}if(programConfig.tanggal_mulai&&tanggal<programConfig.tanggal_mulai){msg.textContent='Tanggal pengajian tidak boleh sebelum tanggal mulai program SIDOJI.';return;}
+  const btn=$('savePengajianBtn');btn.disabled=true;btn.textContent='Menyimpan...';msg.textContent='';
+  const {data,error}=await sb.rpc('simpan_pengajian_sidoji',{p_peserta_id:pesertaId,p_tanggal:tanggal,p_jenis:jenis,p_status:status,p_keterangan:ket});
+  if(error){msg.textContent='Gagal: '+error.message;btn.disabled=false;btn.textContent='💾 Simpan Presensi';return;}
+  toast('Presensi pengajian berhasil disimpan.');clearPengajian();await loadPengajian();btn.disabled=false;btn.textContent='💾 Simpan Presensi';
+}
+async function loadPengajian(){
+  const q=($('pengajianListSearch')?.value||'').trim().toLowerCase();
+  const {data,error}=await sb.rpc('get_pengajian_sidoji',{p_limit:300});
+  if(error){$('pengajianBody').innerHTML=`<tr><td colspan="7" class="empty">Gagal memuat: ${esc(error.message)}</td></tr>`;return;}
+  let rows=isNonAdmin() && currentPesertaId
+    ? (data||[]).filter(x=>String(x.peserta_id)===String(currentPesertaId))
+    : (data||[]);
+  if(q)rows=rows.filter(x=>(x.nama_lengkap||'').toLowerCase().includes(q)||(x.kode_peserta||'').toLowerCase().includes(q));
+  $('pengajianBody').innerHTML=rows.length?rows.map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.kode_peserta||'-')}</td><td><b>${esc(x.nama_lengkap||'-')}</b></td><td>${esc(x.nama_lembaga||'-')}</td><td>${esc(x.jenis||'-')}</td><td>${esc(x.status||'-')}</td><td>${esc(x.keterangan||'-')}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">Belum ada data pengajian.</td></tr>';
+}
+
+function initPengajianRekap(){
+  const now=new Date();
+  const first=new Date(now.getFullYear(),now.getMonth(),1);
+  const fmt=d=>d.toISOString().slice(0,10);
+  $('pgRekapMulai').value=fmt(first);
+  $('pgRekapSelesai').value=today();
+  loadPengajianLembaga();
+}
+async function loadPengajianLembaga(){
+  const {data,error}=await sb.from('lembaga').select('id,nama_lembaga').eq('status','Aktif').order('nama_lembaga');
+  if(error)return;
+  const sel=$('pgRekapLembaga');
+  sel.innerHTML='<option value="">Semua Lembaga</option>'+(data||[]).map(x=>`<option value="${x.id}">${esc(x.nama_lembaga)}</option>`).join('');
+}
+async function loadRekapPengajian(){
+  const mulai=$('pgRekapMulai').value, selesai=$('pgRekapSelesai').value;
+  if(!mulai||!selesai){toast('Tanggal rekap belum lengkap.');return}
+  if(mulai>selesai){toast('Tanggal mulai tidak boleh setelah tanggal selesai.');return}
+  const jenis=$('pgRekapJenis').value||null;
+  const lembaga=$('pgRekapLembaga').value||null;
+  const {data,error}=await sb.rpc('get_rekap_pengajian_sidoji',{
+    p_tanggal_mulai:mulai,p_tanggal_selesai:selesai,p_jenis:jenis,p_lembaga_id:lembaga
+  });
+  if(error){toast('Rekap Pengajian gagal: '+error.message);return}
+  const rows=data||[];
+  const totals=rows.reduce((a,x)=>({
+    hadir:a.hadir+Number(x.hadir||0),izin:a.izin+Number(x.izin||0),
+    sakit:a.sakit+Number(x.sakit||0),alpa:a.alpa+Number(x.alpa||0),
+    belum:a.belum+Number(x.belum_presensi||0)
+  }),{hadir:0,izin:0,sakit:0,alpa:0,belum:0});
+  const totalPeserta=rows.length;
+  $('pgTotalPeserta').textContent=totalPeserta.toLocaleString('id-ID');
+  $('pgTotalHadir').textContent=totals.hadir.toLocaleString('id-ID');
+  $('pgTotalIzin').textContent=totals.izin.toLocaleString('id-ID');
+  $('pgTotalSakit').textContent=totals.sakit.toLocaleString('id-ID');
+  $('pgTotalAlpa').textContent=totals.alpa.toLocaleString('id-ID');
+  $('pgTotalBelum').textContent=totals.belum.toLocaleString('id-ID');
+  $('pgPersentase').textContent=(totalPeserta?((totals.hadir/totalPeserta)*100):0).toFixed(2)+'%';
+  $('pgRekapBody').innerHTML=rows.length?rows.map((x,i)=>{
+    const hadir=Number(x.hadir||0), izin=Number(x.izin||0), sakit=Number(x.sakit||0), alpa=Number(x.alpa||0);
+    let status='Belum Presensi', cls='status-belum';
+    if(hadir>0){status='Hadir';cls='status-hadir'}
+    else if(izin>0){status='Izin';cls='status-izin'}
+    else if(sakit>0){status='Sakit';cls='status-sakit'}
+    else if(alpa>0){status='Alpa';cls='status-alpa'}
+    return `<tr>
+      <td>${i+1}</td><td>${esc(x.kode_peserta||'-')}</td><td><b>${esc(x.nama_lengkap)}</b></td>
+      <td>${esc(x.nama_lembaga||'-')}</td><td>${hadir}</td><td>${izin}</td>
+      <td>${sakit}</td><td>${alpa}</td><td>${Number(x.total_presensi||0)}</td>
+      <td><span class="status-badge ${cls}">${status}</span></td>
+      <td>${Number(x.persentase||0).toFixed(2)}%</td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="11" class="empty">Tidak ada peserta.</td></tr>';
+}
+
+async function openGuruPengajian(){
+  ['dashboardPage','tilawahPage','hutangPage','rekapPage','laporanPage','akunPage','placeholderPage'].forEach(id=>setHidden(id,true));
+  setHidden('pengajianPage',false);
+  $('pageTitle').textContent='Pengajian Saya';
+  if(!pengajianPesertaCache.length)await loadPengajianPeserta();
+  // Paksa peserta aktif ke akun guru dan sembunyikan pencarian peserta.
+  if($('pengajianPesertaId'))$('pengajianPesertaId').value=currentPesertaId||'';
+  const me=pengajianPesertaCache.find(x=>String(x.id)===String(currentPesertaId));
+  if(me){
+    window._selectedPengajianPerson=me;
+    if($('pengajianSearch'))$('pengajianSearch').value=me.nama_lengkap||'';
+    if($('pengajianSelected')){ $('pengajianSelected').innerHTML=`<b>${esc(me.nama_lengkap)}</b><br><span>${esc(me.kode_peserta||'-')} • ${esc(me.nama_lembaga||'-')}</span>`; $('pengajianSelected').classList.remove('hidden'); }
+  }
+  if($('pengajianTanggal') && !$('pengajianTanggal').value)$('pengajianTanggal').value=today();
+  await loadPengajian();
+  updatePengajianSummary();
+}
+
+async function openPengajian(){
+  ['dashboardPage','tilawahPage','hutangPage','rekapPage','placeholderPage','laporanPage','akunPage'].forEach(id=>setHidden(id,true));
+  setHidden('pengajianPage',false);
+  $('pageTitle').textContent='Pengajian';
+  if(!pengajianPesertaCache.length)await loadPengajianPeserta();
+  if(!$('pengajianTanggal').value)$('pengajianTanggal').value=today();
+  await loadPengajian();
+  updatePengajianSummary();
+}
+
+async function openRekap(){
+  ['dashboardPage','tilawahPage','hutangPage','placeholderPage','laporanPage','akunPage','pengajianPage'].forEach(id=>setHidden(id,true));
+  setHidden('rekapPage',false);
+  $('pageTitle').textContent='Rekap';
+  await loadRekap();
+}
+
+function normalizeLoginIdentifier(value){
+  const v=String(value||'').trim().toLowerCase();
+  if(!v)return '';
+  // Admin tetap memakai email asli. Guru cukup memakai username.
+  return v.includes('@') ? v : `${v}@sidoji.local`;
+}
+async function loginSIDOJI(e){
+  e.preventDefault();
+  const identifier=$('email').value.trim();
+  const password=$('password').value;
+  const btn=document.querySelector('#loginForm button[type=submit]');
+  if(!identifier || !password){showLoginMsg('Username/email dan password wajib diisi.',false);return}
+  btn.disabled=true; btn.textContent='Memproses...'; showLoginMsg('Memproses login...',true);
+  try{
+    const authIdentifier=normalizeLoginIdentifier(identifier);
+    const {data,error}=await sb.auth.signInWithPassword({email:authIdentifier,password});
+    if(error){
+      console.error('[SIDOJI LOGIN]',error);
+      showLoginMsg('Login gagal: '+(error.message||JSON.stringify(error)),false);
+      return;
+    }
+    if(!data?.session){showLoginMsg('Login berhasil tetapi sesi belum terbentuk. Silakan coba lagi.',false);return}
+    await enterApp(data.session);
+  }catch(err){
+    console.error('[SIDOJI LOGIN EXCEPTION]',err);
+    showLoginMsg('Kesalahan koneksi/login: '+(err?.message||String(err)),false);
+  }finally{btn.disabled=false;btn.textContent='Masuk'}
+}
+$('loginForm').addEventListener('submit',loginSIDOJI);
+
+// Pulihkan sesi Supabase yang masih aktif agar pengguna tidak selalu diminta login ulang.
+sb.auth.getSession().then(async ({data,error})=>{
+  if(error){console.warn('[SIDOJI SESSION]',error);return;}
+  if(data?.session){await enterApp(data.session);}
+}).catch(err=>console.warn('[SIDOJI SESSION EXCEPTION]',err));
+$('simpanPengaturanBtn')&&($('simpanPengaturanBtn').onclick=()=>saveProgramSettings(false));
+$('aktifkanProgramBtn')&&($('aktifkanProgramBtn').onclick=()=>saveProgramSettings(true));
+$('logoutBtn').onclick=async()=>{await sb.auth.signOut();$('appPage').classList.add('hidden');$('loginPage').classList.remove('hidden');$('password').value='';toast('Berhasil keluar')};$('refreshTilawahBtn').onclick=async()=>{await loadPeserta();if(isNonAdmin()&&currentPesertaId){await lockGuruTilawahToSelf();await loadGuruTilawah()}else{await loadTilawah()}};$('saveTilawahBtn').onclick=saveTilawah;$('clearTilawahBtn').onclick=clearTilawah;$('tilawahTanggal').onchange=loadTilawahLimit;$('pesertaSearch').oninput=e=>{if(isNonAdmin()){toast('Akun peserta hanya dapat mengisi Tilawah sendiri.');return;}showPeople(e.target.value)};$('tilawahListSearch').oninput=()=>loadTilawah();$('hutangSearch').oninput=renderHutang;$('refreshHutangBtn').onclick=loadHutang;
+document.addEventListener('click',e=>{if(!e.target.closest('#pesertaSearch')&&!e.target.closest('#personResults'))$('personResults').classList.add('hidden');if(!e.target.closest('#pengajianSearch')&&!e.target.closest('#pengajianResults'))$('pengajianResults').classList.add('hidden')});
+
+$('pengajianSearch').oninput=e=>showPengajianPeople(e.target.value);$('pengajianTanggal').onchange=updatePengajianSummary;$('pengajianJenis').onchange=updatePengajianSummary;document.querySelectorAll('input[name="pengajianStatus"]').forEach(x=>x.onchange=updatePengajianSummary);$('savePengajianBtn').onclick=savePengajian;$('clearPengajianBtn').onclick=clearPengajian;$('refreshPengajianBtn').onclick=async()=>{await loadPengajianPeserta();await loadPengajian()};$('pengajianListSearch').oninput=loadPengajian;
+document.querySelectorAll('.nav button').forEach(btn=>btn.onclick=async()=>{
+  const page=btn.dataset.page;
+  if(isNonAdmin() && !['dashboard','tilawah','hutang','pengajian'].includes(page)){toast('Menu ini hanya untuk Admin.');return;}
+  if(isNonAdmin() && !guardProgramForUser()) return;
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+  if(isNonAdmin() && !['dashboard','tilawah','hutang','pengajian'].includes(page)){toast('Menu ini hanya untuk Admin.');return;}
+  setHidden('akunPage',true);
+
+  if(page==='dashboard'){
+    await openDashboard();
+  }else if(page==='peserta'){
+    await openPesertaPage();
+  }else if(page==='tilawah'){
+    $('laporanPage').classList.add('hidden');
+    await openTilawah();
+  }else if(page==='hutang'){
+    $('laporanPage').classList.add('hidden');
+    await openHutang();
+  }else if(page==='pengajian'){
+    if(isNonAdmin()){await openGuruPengajian();return;}
+    $('laporanPage').classList.add('hidden');
+    await openPengajian();
+  }else if(page==='rekap'){
+    $('laporanPage').classList.add('hidden');
+    await openRekap();
+  }else if(page==='akun'){
+    if(isNonAdmin()){toast('Menu Akun Guru hanya untuk admin.');return;}
+    ['dashboardPage','tilawahPage','hutangPage','pengajianPage','rekapPage','laporanPage','placeholderPage','pengaturanPage'].forEach(id=>setHidden(id,true));
+    setHidden('akunPage',false); $('pageTitle').textContent='Akun Guru'; await loadAkunGuru();
+  }else if(page==='pengaturan'){
+    if(isNonAdmin()){toast('Pengaturan hanya untuk admin.');return;}
+    ['dashboardPage','tilawahPage','hutangPage','pengajianPage','rekapPage','laporanPage','placeholderPage','akunPage'].forEach(id=>setHidden(id,true));
+    setHidden('pengaturanPage',false); $('pageTitle').textContent='Pengaturan Program'; await loadProgramSettings();
+  }else if(page==='laporan'){
+    ['dashboardPage','tilawahPage','hutangPage','pengajianPage','rekapPage','placeholderPage','pengaturanPage'].forEach(id=>setHidden(id,true));
+    setHidden('laporanPage',false);
+    $('pageTitle').textContent='Laporan';
+    initLaporanFilters();
+  }else{
+    ['dashboardPage','tilawahPage','hutangPage','pengajianPage','rekapPage','laporanPage'].forEach(id=>setHidden(id,true));
+    setHidden('placeholderPage',false);
+    $('pageTitle').textContent=btn.textContent.replace(/^\S+\s/,'');
+    $('placeholderTitle').textContent=btn.textContent;
+  }
+});
+$('tilawahTanggal').value=today();renderJuz();updateSummary();initRekapInputs();if($('pesertaPageSearch'))$('pesertaPageSearch').oninput=renderPesertaPage;if($('refreshAkunBtn'))$('refreshAkunBtn').onclick=loadAkunGuru;if($('akunGuruSearch'))$('akunGuruSearch').oninput=loadAkunGuru;if($('buatAkunTerpilihBtn'))$('buatAkunTerpilihBtn').onclick=buatAkunTerpilih;if($('buatSemuaAkunBtn'))$('buatSemuaAkunBtn').onclick=buatSemuaAkun;if($('bersihkanAkunBtn'))$('bersihkanAkunBtn').onclick=sinkronkanAkunLama;$('rekapPeriode').onchange=toggleRekapInputs;$('tampilkanRekapBtn').onclick=loadRekap;$('refreshRekapBtn').onclick=loadRekap;
+
+/* =========================================================
+   LAPORAN SIDOJI - DIPISAH DARI REKAP
+   ========================================================= */
+function initLaporanFilters(){const d=new Date(),y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0');$('laporanTilawahTanggal').value=today();$('laporanTilawahBulan').value=`${y}-${m}`;$('laporanTilawahTahun').value=y;$('laporanPengajianMulai').value=`${y}-${m}-01`;$('laporanPengajianSelesai').value=today();toggleLaporanTilawahInputs();loadLaporanLembaga()}
+async function loadLaporanLembaga(){const {data,error}=await sb.from('lembaga').select('id,nama_lembaga').eq('status','Aktif').order('nama_lembaga');if(error){toast('Daftar lembaga gagal dimuat: '+error.message);return}const o='<option value="">Semua Lembaga</option>'+(data||[]).map(x=>`<option value="${x.id}">${esc(x.nama_lembaga)}</option>`).join('');$('laporanTilawahLembaga').innerHTML=o;$('laporanPengajianLembaga').innerHTML=o}
+function toggleLaporanTilawahInputs(){const p=$('laporanTilawahPeriode').value;$('laporanTilawahTanggal').disabled=p!=='harian';$('laporanTilawahBulan').disabled=p!=='bulanan';$('laporanTilawahTahun').disabled=p!=='tahunan'}
+function laporanLembagaName(id){return $(id)?.selectedOptions?.[0]?.textContent||'Semua Lembaga'}
+async function loadLaporanTilawah(){const p={p_periode:$('laporanTilawahPeriode').value,p_tanggal:$('laporanTilawahTanggal').value||today(),p_bulan:Number(($('laporanTilawahBulan').value||today().slice(0,7)).slice(5,7)),p_tahun:Number($('laporanTilawahTahun').value||new Date().getFullYear())},lid=$('laporanTilawahLembaga').value||'',ln=laporanLembagaName('laporanTilawahLembaga');const {data,error}=await sb.rpc('get_rekap_sidoji_v1',p);if(error){toast('Laporan Tilawah gagal dimuat: '+error.message);return}let r=data||[];if(lid)r=r.filter(x=>String(x.nama_lembaga||'').trim()===String(ln).trim());const tj=r.reduce((a,x)=>a+Number(x.total_juz||0),0),hp=r.reduce((a,x)=>a+Number(x.hutang_periode||0),0),sh=r.reduce((a,x)=>a+Number(x.saldo_hutang||0),0),sel=r.filter(x=>Number(x.hari_tilawah||0)>0).length;$('laporanTilawahTotalPeserta').textContent=r.length.toLocaleString('id-ID');$('laporanTilawahSelesai').textContent=sel;$('laporanTilawahBelum').textContent=Math.max(0,r.length-sel);$('laporanTilawahTotalJuz').textContent=tj+' Juz';$('laporanTilawahHutangPeriode').textContent=hp+' Juz';$('laporanTilawahSaldoHutang').textContent=sh+' Juz';$('laporanTilawahBody').innerHTML=r.length?r.map((x,i)=>{const sal=Number(x.saldo_hutang||0);return `<tr><td>${i+1}</td><td>${esc(x.kode_peserta||'-')}</td><td><b>${esc(x.nama_lengkap||'-')}</b></td><td>${esc(x.nama_lembaga||'-')}</td><td>${Number(x.hari_wajib||0)}</td><td>${Number(x.hari_tilawah||0)}</td><td>${Number(x.total_juz||0)}</td><td>${Number(x.hutang_periode||0)}</td><td>${sal}</td><td>${Number(x.persentase_tilawah||0).toFixed(2)}%</td><td><span class="status-badge ${sal<=0?'status-lunas':'status-hutang'}">${sal<=0?'LUNAS':'MASIH MEMILIKI HUTANG'}</span></td></tr>`}).join(''):'<tr><td colspan="11" class="empty">Tidak ada data.</td></tr>';const d=await sb.rpc('get_rekap_detail_sidoji_v1',p);let dr=d.error?[]:(d.data||[]);if(lid)dr=dr.filter(x=>String(x.nama_lembaga||'').trim()===String(ln).trim());$('laporanTilawahDetailBody').innerHTML=dr.length?dr.map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.kode_peserta||'-')}</td><td>${esc(x.nama_lengkap||'-')}</td><td>${esc(x.nama_lembaga||'-')}</td><td>Juz ${Number(x.juz)}</td><td>${esc(x.status||'-')}</td><td>${esc(x.keterangan||'-')}</td></tr>`).join(''):'<tr><td colspan="7" class="empty">Tidak ada detail tilawah.</td></tr>';$('printTilawahPeriode').textContent=p.p_periode==='harian'?'Tanggal: '+p.p_tanggal:p.p_periode==='bulanan'?'Bulan: '+$('laporanTilawahBulan').value:'Tahun: '+p.p_tahun;$('printTilawahLembaga').textContent='Lembaga: '+ln}
+async function loadLaporanPengajian(){const mulai=$('laporanPengajianMulai').value,selesai=$('laporanPengajianSelesai').value,lid=$('laporanPengajianLembaga').value||null;if(!mulai||!selesai||mulai>selesai){toast('Periode Pengajian tidak valid.');return}const {data,error}=await sb.rpc('get_rekap_pengajian_sidoji',{p_tanggal_mulai:mulai,p_tanggal_selesai:selesai,p_jenis:$('laporanPengajianJenis').value||null,p_lembaga_id:lid});if(error){toast('Laporan Pengajian gagal dimuat: '+error.message);return}const r=data||[],t=r.reduce((a,x)=>({h:a.h+Number(x.hadir||0),i:a.i+Number(x.izin||0),s:a.s+Number(x.sakit||0),a:a.a+Number(x.alpa||0)}),{h:0,i:0,s:0,a:0});$('laporanPengajianTotalPeserta').textContent=r.length;$('laporanPengajianHadir').textContent=t.h;$('laporanPengajianIzin').textContent=t.i;$('laporanPengajianSakit').textContent=t.s;$('laporanPengajianAlpa').textContent=t.a;$('laporanPengajianPersentase').textContent=(r.length?t.h/r.length*100:0).toFixed(2)+'%';$('laporanPengajianBody').innerHTML=r.length?r.map((x,i)=>{const h=Number(x.hadir||0),iz=Number(x.izin||0),s=Number(x.sakit||0),a=Number(x.alpa||0);let st='Belum Presensi',cl='status-belum';if(h){st='Hadir';cl='status-hadir'}else if(iz){st='Izin';cl='status-izin'}else if(s){st='Sakit';cl='status-sakit'}else if(a){st='Alpa';cl='status-alpa'}return `<tr><td>${i+1}</td><td>${esc(x.kode_peserta||'-')}</td><td><b>${esc(x.nama_lengkap||'-')}</b></td><td>${esc(x.nama_lembaga||'-')}</td><td>${h}</td><td>${iz}</td><td>${s}</td><td>${a}</td><td>${Number(x.total_presensi||0)}</td><td><span class="status-badge ${cl}">${st}</span></td><td>${Number(x.persentase||0).toFixed(2)}%</td></tr>`}).join(''):'<tr><td colspan="11" class="empty">Tidak ada data pengajian.</td></tr>';$('printPengajianPeriode').textContent='Periode: '+mulai+' s/d '+selesai;$('printPengajianLembaga').textContent='Lembaga: '+laporanLembagaName('laporanPengajianLembaga')}
+async function cetakLaporanTilawah(){
+  const body=$('laporanTilawahBody');
+  if(!body)return;
+  if(body.innerText.includes('Silakan tampilkan laporan')) await loadLaporanTilawah();
+  if(body.innerText.includes('Silakan tampilkan laporan')){toast('Silakan tampilkan Laporan Tilawah terlebih dahulu.');return}
+  document.body.classList.remove('print-pengajian','print-global');
+  document.body.classList.add('print-tilawah');
+  setTimeout(()=>window.print(),120);
+  setTimeout(()=>document.body.classList.remove('print-tilawah'),1200);
+}
+
+async function cetakLaporanPengajian(){
+  const body=$('laporanPengajianBody');
+  if(!body)return;
+  if(body.innerText.includes('Silakan tampilkan laporan')) await loadLaporanPengajian();
+  if(body.innerText.includes('Silakan tampilkan laporan')){toast('Silakan tampilkan Laporan Pengajian terlebih dahulu.');return}
+  document.body.classList.remove('print-tilawah','print-global');
+  document.body.classList.add('print-pengajian');
+  setTimeout(()=>window.print(),120);
+  setTimeout(()=>document.body.classList.remove('print-pengajian'),1200);
+}
+
+document.addEventListener('click', e=>{
+  if(e.target.closest('#laporanPage')) return;
+});
+
+if($('refreshLaporanBtn')) $('refreshLaporanBtn').onclick=()=>initLaporanFilters();
+if($('laporanTilawahPeriode')) $('laporanTilawahPeriode').onchange=toggleLaporanTilawahInputs;
+if($('tampilkanLaporanTilawahBtn')) $('tampilkanLaporanTilawahBtn').onclick=loadLaporanTilawah;
+if($('refreshLaporanTilawahBtn')) $('refreshLaporanTilawahBtn').onclick=loadLaporanTilawah;
+if($('cetakLaporanTilawahBtn')) $('cetakLaporanTilawahBtn').onclick=cetakLaporanTilawah;
+if($('laporanTilawahLembaga')) $('laporanTilawahLembaga').onchange=loadLaporanTilawah;
+
+if($('tampilkanLaporanPengajianBtn')) $('tampilkanLaporanPengajianBtn').onclick=loadLaporanPengajian;
+if($('refreshLaporanPengajianBtn')) $('refreshLaporanPengajianBtn').onclick=loadLaporanPengajian;
+if($('cetakLaporanPengajianBtn')) $('cetakLaporanPengajianBtn').onclick=cetakLaporanPengajian;
+if($('laporanPengajianLembaga')) $('laporanPengajianLembaga').onchange=loadLaporanPengajian;
+
+if($('cetakRekapTilawahTopBtn')) $('cetakRekapTilawahTopBtn').onclick=cetakLaporanTilawah;
+if($('cetakRekapPengajianTopBtn')) $('cetakRekapPengajianTopBtn').onclick=cetakLaporanPengajian;
+
+</script></body></html>
